@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/kauavfialho/syvo-solution/blob/main/assets/Syvo%20-%20Logo.png?raw=true" alt="Syvo" width="720">
+  <img src="https://github.com/kauavfialho/syvo-solution/blob/main/assets/Syvo%20-%20Logo.png?raw=true" alt="Syvo" width="500">
 </p>
 
 <p align="center">
@@ -93,9 +93,3 @@ O histórico de melhorias do Syvo. As versões mais recentes ficam no topo.
 - Registro de renda, contas, gastos e a receber, com navegação por mês.
 - Controle de cartões, patrimônio em widgets e backup em CSV.
 - Assistente por regras e login com Supabase.
-
----
-
-## Licença
-
-Projeto pessoal. Sinta-se livre para se inspirar; adapte ao seu contexto antes de usar.
