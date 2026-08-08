@@ -1,0 +1,22 @@
+# Segredos e variáveis de ambiente — NUNCA subir
+.env
+.env.*
+*.key
+*secret*
+*secrets*
+
+# Backups de dados pessoais (CSVs exportados do Syvo)
+*.csv
+backup*.json
+
+# Pastas de dependências / temporários
+node_modules/
+.DS_Store
+*.log
+tmp/
+.cache/
+
+# Supabase local (config com credenciais)
+.supabase/
+supabase/.temp/
+supabase/.env
