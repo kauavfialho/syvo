@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/syvo-banner.svg" alt="Syvo" width="720">
+  <img src="https://github.com/kauavfialho/syvo-solution/blob/main/assets/Syvo%20-%20Logo.png?raw=true" alt="Syvo" width="720">
 </p>
 
 <p align="center">
