@@ -5,21 +5,18 @@
 *secret*
 *secrets*
 
-# Backups de dados pessoais (CSVs exportados do Syvo)
+# Dados pessoais (backups, exportações e bancos do Syvo)
 *.csv
+*.db
+*.db-wal
+*.db-shm
 backup*.json
 
-# Pastas de dependências / temporários
+# Dependências, build e temporários
 node_modules/
+dist/
 .DS_Store
 *.log
 tmp/
 .cache/
-
-# Supabase local (config com credenciais)
-.supabase/
-supabase/.temp/
-supabase/.env
-
-# descarte temporario (apagar manualmente)
-_to_delete/
+.vscode/

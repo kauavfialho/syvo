@@ -1,0 +1,43 @@
+{
+  "name": "syvo",
+  "productName": "Syvo",
+  "version": "2.0.0",
+  "description": "Syvo - controle financeiro pessoal com banco local",
+  "main": "electron/main.js",
+  "author": "Kauã Fialho",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test testes/*.test.js",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.2.1",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.kauafialho.syvo",
+    "productName": "Syvo",
+    "artifactName": "Syvo-${version}-${os}-${arch}.${ext}",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["electron/**", "app/**", "build/icon.png", "package.json"],
+    "mac": {
+      "category": "public.app-category.finance",
+      "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
+      "identity": "-",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "signAndEditExecutable": true
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}

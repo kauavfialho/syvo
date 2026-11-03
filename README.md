@@ -1,101 +1,60 @@
-<p align="center">
-  <img src="assets/syvo-banner.svg" alt="Syvo" width="720">
-</p>
+# Syvo
 
-<p align="center">
-  <img src="https://img.shields.io/badge/status-em%20desenvolvimento-2f6f4f?style=flat-square" alt="status">
-  <img src="https://img.shields.io/badge/frontend-HTML%20%C2%B7%20CSS%20%C2%B7%20JS-566152?style=flat-square" alt="frontend">
-  <img src="https://img.shields.io/badge/backend-Supabase-2f6f4f?style=flat-square" alt="backend">
-  <img src="https://img.shields.io/badge/sem%20build-arquivo%20%C3%BAnico-a13d3d?style=flat-square" alt="single file">
-</p>
+App de computador para organizar o dinheiro do mês, o patrimônio e o imposto de renda. Funciona no Mac e no Windows, sem login e sem servidor: os dados ficam em um arquivo no próprio computador.
 
-<p align="center">
-  <b>Syvo</b> é um app pessoal de finanças para organizar o dinheiro do mês —
-  renda, contas, gastos e o que ainda está por receber — mês a mês, do seu jeito.
-</p>
+## Instalar
 
----
+Baixe o instalador na página [Releases](https://github.com/kauavfialho/syvo-solution/releases):
 
-## O que é o Syvo
+| Sistema | Arquivo |
+|---|---|
+| Mac com Apple Silicon (M1 ou mais novo) | `Syvo-x.x.x-mac-arm64.dmg` |
+| Mac com Intel | `Syvo-x.x.x-mac-x64.dmg` |
+| Windows | `Syvo-x.x.x-win-x64.exe` |
 
-O Syvo é um controle financeiro pessoal feito para ser simples e honesto. Ele não
-investe por você, não dá palpite mágico: ele mostra, de forma clara, para onde o
-seu dinheiro vai e de onde ele vem, para você tomar as suas próprias decisões.
+O app não tem certificado pago, então o sistema avisa na primeira vez.
 
-A ideia central é acompanhar **um mês por vez**, com a possibilidade de navegar
-para meses passados e futuros. Cada sobra do mês vira um destino no seu patrimônio,
-e cada compromisso (uma conta a pagar, um valor a receber) fica visível antes de
-virar problema.
+**Mac:** abra o `.dmg` e arraste o Syvo para Aplicativos. Se aparecer um aviso de que o app não pode ser aberto, vá em Ajustes do Sistema, Privacidade e Segurança, e clique em "Abrir Mesmo Assim". Se o aviso disser que o app está danificado, rode no Terminal:
 
-## Para que serve
+```bash
+xattr -cr /Applications/Syvo.app
+```
 
-- **Registrar** salário, contas fixas, gastos do dia a dia e valores a receber.
-- **Enxergar o mês inteiro** num resumo: renda, recebido, contas, gastos, saldo e a receber.
-- **Controlar cartões de crédito**: quanto de limite está usado, quanto está preso
-  em parcelas futuras e quanto ainda está livre.
-- **Organizar o patrimônio** em widgets (reserva, conta, renda fixa, ações, cripto e mais).
-- **Não perder prazos**: marcar até quando pretende receber ou precisa pagar, com
-  aviso quando a data chega.
-- **Lidar com mais de uma moeda**: lançar em real, dólar, euro ou libra, com a
-  cotação do dia registrada e uma visão convertida para a sua moeda base.
+**Windows:** abra o `.exe`. Na tela azul do SmartScreen, clique em "Mais informações" e depois em "Executar assim mesmo".
 
-## Principais funcionalidades
+## Seus dados e backups
 
-| Área | O que faz |
-|------|-----------|
-| **Fluxo** | Renda, contas, gastos e a receber, com navegação por mês e resumo do topo. |
-| **Contas e renda fixas** | Replicam automaticamente nos próximos meses. |
-| **Parcelamentos** | Uma linha por parcela, com aviso na última e destaque visual. |
-| **A receber** | Conta no mês em que o dinheiro realmente entrou, não no previsto. |
-| **Cartões** | Faturas do mês, limite usado / preso em parcelas / livre, gráficos. |
-| **Patrimônio** | Widgets por tipo de ativo, com rendimento estimado e "dinheiro a alocar". |
-| **Multimoeda** | Real, dólar, euro e libra; cotação do dia travada por lançamento. |
-| **Prazos e avisos** | Data prevista de pagar/receber, card de alerta e lembrete por e-mail. |
-| **Assistente** | Um chat por regras que responde sobre folga, parcelamentos e economia — tudo local. |
-| **Perfil e segurança** | Foto de perfil, backup em CSV, redefinição de senha, encerrar conta. |
+O banco fica em um arquivo `syvo.db`, e o caminho aparece em **Dados e backup**, no menu do app. Desinstalar o app não apaga esse arquivo.
 
-## Como funciona por baixo
+- **Backup automático:** uma cópia por dia ao abrir o app, guardando as 30 mais recentes.
+- **Pasta extra:** escolha uma pasta do iCloud, Google Drive ou OneDrive para a cópia sair do computador.
+- **Formatar ou trocar de computador:** instale o app, abra **Dados e backup** e use **Restaurar um backup** com o arquivo `.db` mais recente.
 
-- **Frontend:** um único arquivo `index.html` com HTML, CSS e JavaScript embutidos.
-  Sem etapa de build, sem framework — a simplicidade é proposital.
-- **Backend:** [Supabase](https://supabase.com) (autenticação por e-mail/senha e
-  banco de dados Postgres). Os dados de cada usuário são protegidos por Row Level
-  Security (RLS).
-- **Câmbio:** cotações do dia via [Frankfurter](https://frankfurter.dev) (gratuito).
-- **E-mails:** lembretes e backups via Resend, disparados por funções do Supabase.
+O mesmo backup funciona no Mac e no Windows. Os dados não são sincronizados sozinhos: para levar de um computador para o outro, restaure o backup.
 
-## Notas de versão
+## Imposto de renda
 
-O histórico de melhorias do Syvo. As versões mais recentes ficam no topo.
+A aba reúne rendimentos, pagamentos, dependentes, bens, dívidas e comprovantes de cada ano. Ela compara a declaração simplificada com a completa, aponta o que falta conferir e gera um relatório em PDF para preencher o programa da Receita.
 
-### v1.4 — Prazos e lembretes de vencimento
-- Data prevista de pagar (em gastos) e de receber (em a receber).
-- Card de alerta em vermelho forte quando um item vence e não foi resolvido.
-- Notificação no navegador com o resumo do que está vencendo.
-- E-mail automático diário para quem tem contas a pagar ou valores a receber vencendo.
+- O resultado é uma estimativa e o app não envia a declaração.
+- Ganho de capital, operações em bolsa, atividade rural e tributação mínima de alta renda ficam fora do cálculo.
+- As regras de cada ano ficam em `app/js/ir-calculo.js`. Anos cadastrados: 2025 e 2026.
+- Os limites de obrigatoriedade da declaração de 2027 ainda precisam ser cadastrados.
 
-### v1.3 — Multimoeda
-- Lançamentos em real, dólar, euro e libra.
-- Cotação do dia buscada automaticamente e travada em cada lançamento.
-- Painel de resumo por moeda, com opção de visão convertida para a moeda base.
-- Máscara de valor automática que segue o padrão de cada moeda.
+## Desenvolvimento
 
-### v1.2 — Cartões mais fiéis
-- Uso do cartão passa a considerar o limite preso em parcelas futuras.
-- Gráfico de uso com três faixas: usado, preso e disponível.
-- Cards de gráfico recolhíveis, que abrem ao clicar.
+```bash
+npm install
+```
 
-### v1.1 — Filtros e organização
-- Filtros inteligentes em todas as listas (por moeda, cartão, categoria e mais).
-- Ordenação de gastos por proximidade do fim do parcelamento.
+```bash
+npm start
+```
 
-### v1.0 — Base
-- Registro de renda, contas, gastos e a receber, com navegação por mês.
-- Controle de cartões, patrimônio em widgets e backup em CSV.
-- Assistente por regras e login com Supabase.
+```bash
+npm test
+```
 
----
+Para gerar uma versão nova, atualize `version` no `package.json` e publique uma tag `v*`. O GitHub Actions monta os instaladores e cria a Release.
 
-## Licença
-
-Projeto pessoal. Sinta-se livre para se inspirar; adapte ao seu contexto antes de usar.
+A versão web antiga, com Supabase, continua na branch `main`.

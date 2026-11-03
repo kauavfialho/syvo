@@ -1,0 +1,57 @@
+name: Instaladores
+
+# criar uma tag v2.0.0 (ou rodar na mao pela aba Actions) gera os instaladores de mac e windows
+# e publica tudo numa Release do GitHub, pronto pra baixar.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  construir:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            comando: dist:mac
+            arquivos: dist/*.dmg
+          - os: windows-latest
+            comando: dist:win
+            arquivos: dist/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run ${{ matrix.comando }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: instalador-${{ matrix.os }}
+          path: ${{ matrix.arquivos }}
+          if-no-files-found: error
+
+  publicar:
+    needs: construir
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: instaladores
+          merge-multiple: true
+      - name: Publica a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" instaladores/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Syvo $GITHUB_REF_NAME" \
+            --notes "Baixe o .dmg para Mac ou o .exe para Windows. Veja o README para abrir o app na primeira vez."
