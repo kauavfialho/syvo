@@ -20,3 +20,6 @@ tmp/
 .supabase/
 supabase/.temp/
 supabase/.env
+
+# descarte temporario (apagar manualmente)
+_to_delete/
