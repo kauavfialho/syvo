@@ -6,7 +6,7 @@ Leia antes de mexer. Idioma de tudo (UI, comentários, commits): português do B
 
 App de computador pessoal de finanças (Mac e Windows), de uso próprio do dono
 (31kauafialho@gmail.com). Sem login, sem servidor e sem nuvem. Internet só para a cotação de moedas.
-A versão web antiga (Supabase/Netlify) continua na branch `main`; nada daqui depende dela.
+O `index.html` da raiz é o site antigo, guardado de propósito; a versão mais recente do site (Supabase/Netlify) está na branch `site-web`. Nada do app depende deles.
 
 ## Arquitetura
 

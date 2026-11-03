@@ -5903,7 +5903,6 @@ document.getElementById('formPerfil').addEventListener('submit', async e => {
 async function atualizarBlocoBackup(){
   const e = await window.syvoNativo.backupEstado();
   document.getElementById('bkUltimo').textContent = e.ultimoBackup ? new Date(e.ultimoBackup).toLocaleString('pt-BR') : 'ainda não feito';
-  document.getElementById('bkPasta').textContent = e.pasta || 'nenhuma';
   if(e.erro) statusBackup('Falha no último backup: ' + e.erro, true);
 }
 function statusBackup(msg, ruim){
@@ -5921,17 +5920,18 @@ document.getElementById('btnAbrirSeguranca').addEventListener('click', async () 
 document.getElementById('btnFecharSeguranca').addEventListener('click', () => {
   document.getElementById('modalSeguranca').classList.add('hidden');
 });
-document.getElementById('btnBkPasta').addEventListener('click', async () => {
-  const r = await window.syvoNativo.backupEscolherPasta();
-  if(r.cancelado) return;
-  await atualizarBlocoBackup();
-  statusBackup('Pasta salva e backup feito nela.');
+document.getElementById('btnBkExportar').addEventListener('click', async () => {
+  try {
+    const r = await window.syvoNativo.backupExportar();
+    if(!r.cancelado) statusBackup('Backup exportado.');
+  } catch(err){ statusBackup('Não foi possível exportar: ' + (err.message || err), true); }
 });
 document.getElementById('btnBkAgora').addEventListener('click', async () => {
-  const r = await window.syvoNativo.backupAgora();
-  await atualizarBlocoBackup();
-  if(r.erros.length) statusBackup('Falhou em: ' + r.erros.join(' | '), true);
-  else statusBackup('Backup feito.');
+  try {
+    await window.syvoNativo.backupAgora();
+    await atualizarBlocoBackup();
+    statusBackup('Backup feito.');
+  } catch(err){ statusBackup('Não foi possível fazer o backup: ' + (err.message || err), true); }
 });
 document.getElementById('btnBkRestaurar').addEventListener('click', async () => {
   const r = await window.syvoNativo.backupRestaurar();

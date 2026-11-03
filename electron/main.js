@@ -47,37 +47,24 @@ function podarBackups(pasta){
   const arquivos = fs.readdirSync(pasta).filter(f => /^syvo-backup-.*\.db$/.test(f)).sort().reverse();
   arquivos.slice(BACKUPS_GUARDADOS).forEach(f => fs.unlinkSync(path.join(pasta, f)));
 }
-function pastasDeBackup(){
-  const cfg = lerConfig();
-  return [pastaBackupInterna()].concat(cfg.pastaBackup ? [cfg.pastaBackup] : []);
-}
-// roda ao abrir, uma vez por dia. se a pasta escolhida sumiu (pendrive, etc) so anota o erro.
+// roda ao abrir, uma vez por dia
 function backupDoDia(){
-  const erros = [];
-  let feito = false;
-  for(const pasta of pastasDeBackup()){
-    const destino = path.join(pasta, `syvo-backup-${dia()}.db`);
-    try {
-      if(!fs.existsSync(destino)){ copiarBanco(destino); feito = true; }
-      podarBackups(pasta);
-    } catch(e){ erros.push(`${pasta}: ${e.message}`); }
+  const destino = path.join(pastaBackupInterna(), `syvo-backup-${dia()}.db`);
+  try {
+    if(!fs.existsSync(destino)){
+      copiarBanco(destino);
+      salvarConfig({ ultimoBackup: new Date().toISOString() });
+    }
+    podarBackups(pastaBackupInterna());
+    salvarConfig({ ultimoErroBackup: null });
+  } catch(e){
+    salvarConfig({ ultimoErroBackup: e.message });
   }
-  const mudancas = { ultimoErroBackup: erros.join(' | ') || null };
-  if(feito) mudancas.ultimoBackup = new Date().toISOString();
-  salvarConfig(mudancas);
 }
 function backupAgora(){
-  const ok = [];
-  const erros = [];
-  for(const pasta of pastasDeBackup()){
-    try {
-      copiarBanco(path.join(pasta, `syvo-backup-${dia()}-${hora()}.db`));
-      podarBackups(pasta);
-      ok.push(pasta);
-    } catch(e){ erros.push(`${pasta}: ${e.message}`); }
-  }
-  salvarConfig({ ultimoBackup: new Date().toISOString(), ultimoErroBackup: erros.join(' | ') || null });
-  return { ok, erros };
+  copiarBanco(path.join(pastaBackupInterna(), `syvo-backup-${dia()}-${hora()}.db`));
+  podarBackups(pastaBackupInterna());
+  salvarConfig({ ultimoBackup: new Date().toISOString(), ultimoErroBackup: null });
 }
 
 function apagarArquivosDoBanco(){
@@ -124,16 +111,26 @@ function registrarPontes(){
 
   atender('backup:estado', () => {
     const cfg = lerConfig();
-    return { pasta: cfg.pastaBackup || null, ultimoBackup: cfg.ultimoBackup || null, erro: cfg.ultimoErroBackup || null, banco: caminhoBanco() };
+    return { ultimoBackup: cfg.ultimoBackup || null, erro: cfg.ultimoErroBackup || null };
   });
-  atender('backup:escolher-pasta', async () => {
-    const r = await dialog.showOpenDialog(janela, { title: 'Pasta para os backups do Syvo', properties: ['openDirectory', 'createDirectory'] });
-    if(r.canceled || !r.filePaths[0]) return { cancelado: true };
-    salvarConfig({ pastaBackup: r.filePaths[0] });
-    backupAgora();
-    return { pasta: r.filePaths[0] };
+  atender('backup:agora', () => { backupAgora(); return {}; });
+  atender('backup:exportar', async () => {
+    const r = await dialog.showSaveDialog(janela, {
+      title: 'Exportar backup do Syvo',
+      defaultPath: `syvo-backup-${dia()}.db`,
+      filters: [{ name: 'Backup do Syvo', extensions: ['db'] }]
+    });
+    if(r.canceled || !r.filePath) return { cancelado: true };
+    // vacuum into nao sobrescreve arquivo: gera num temporario e copia por cima do escolhido
+    const temp = path.join(app.getPath('temp'), `syvo-exporta-${crypto.randomUUID()}.db`);
+    try {
+      copiarBanco(temp);
+      fs.copyFileSync(temp, r.filePath);
+    } finally {
+      fs.rmSync(temp, { force: true });
+    }
+    return { arquivo: r.filePath };
   });
-  atender('backup:agora', () => backupAgora());
 
   atender('backup:restaurar', async () => {
     const r = await dialog.showOpenDialog(janela, { title: 'Escolha um backup do Syvo', properties: ['openFile'], filters: [{ name: 'Backup do Syvo', extensions: ['db'] }] });

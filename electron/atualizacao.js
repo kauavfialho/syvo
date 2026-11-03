@@ -124,7 +124,8 @@ function criarAtualizador({ janela, antesDeInstalar, sair }){
   async function verificar(){
     if(!ativo) return { semSuporte: true };
     const r = await net.fetch(urlRelease, { headers: { 'User-Agent': 'Syvo-App', Accept: 'application/vnd.github+json' } });
-    if(r.status === 404) return { versaoAtual: app.getVersion() };   // sem release publicada ainda
+    // repositorio privado tambem responde 404, entao nao da pra dizer que esta na ultima versao
+    if(r.status === 404) return { versaoAtual: app.getVersion(), semAcesso: true };
     if(!r.ok) throw new Error(`O GitHub respondeu ${r.status}.`);
     const nova = interpretarRelease(await r.json(), process.platform, process.arch, app.getVersion());
     const jaAvisou = disponivel && nova && disponivel.versao === nova.versao;

@@ -30,11 +30,10 @@ No Mac, o Syvo precisa estar na pasta Aplicativos.
 
 ## Seus dados e backups
 
-O banco fica em um arquivo `syvo.db`, e o caminho aparece em **Dados e backup**, no menu do app. Desinstalar o app não apaga esse arquivo.
+O banco fica em um arquivo `syvo.db`, que o botão **Mostrar arquivo do banco** abre, em **Dados e backup**. Desinstalar o app não apaga esse arquivo.
 
 - **Backup automático:** uma cópia por dia ao abrir o app, guardando as 30 mais recentes.
-- **Pasta extra:** escolha uma pasta do iCloud, Google Drive ou OneDrive para a cópia sair do computador.
-- **Formatar ou trocar de computador:** instale o app, abra **Dados e backup** e use **Restaurar um backup** com o arquivo `.db` mais recente.
+- **Formatar ou trocar de computador:** antes, use **Exportar backup** e guarde o arquivo em um pendrive ou HD externo. Depois, instale o app e use **Restaurar um backup**.
 
 O mesmo backup funciona no Mac e no Windows. Os dados não são sincronizados sozinhos: para levar de um computador para o outro, restaure o backup.
 
@@ -63,4 +62,4 @@ npm test
 
 Para gerar uma versão nova, atualize `version` no `package.json` e publique uma tag `v*`. O GitHub Actions monta os instaladores e cria a Release.
 
-A versão web antiga, com Supabase, continua na branch `main`.
+O `index.html` da raiz é o site antigo, guardado para um uso futuro. A versão mais recente do site, com Supabase, está na branch `site-web`. Nenhum dos dois entra no app.

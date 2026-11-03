@@ -7,7 +7,7 @@ contextBridge.exposeInMainWorld('syvoNativo', {
   alerta: msg => { ipcRenderer.sendSync('dialogo:alerta', msg); },
   confirmar: msg => ipcRenderer.sendSync('dialogo:confirmar', msg),
   backupEstado: () => ipcRenderer.invoke('backup:estado'),
-  backupEscolherPasta: () => ipcRenderer.invoke('backup:escolher-pasta'),
+  backupExportar: () => ipcRenderer.invoke('backup:exportar'),
   backupAgora: () => ipcRenderer.invoke('backup:agora'),
   backupRestaurar: () => ipcRenderer.invoke('backup:restaurar'),
   mostrarBanco: () => ipcRenderer.invoke('banco:mostrar'),

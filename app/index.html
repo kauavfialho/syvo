@@ -1051,15 +1051,14 @@
 <div class="modal-overlay hidden" id="modalSeguranca">
   <div class="modal" style="max-width:480px;">
     <h2>Dados e backup</h2>
-    <p>Seus dados ficam só neste computador, num arquivo do Syvo. Sem cópia em outro lugar, perder o computador é perder os dados.</p>
+    <p>Seus dados ficam só neste computador, num arquivo do Syvo.</p>
 
     <div class="alocar-detalhe" style="margin-bottom:16px;">
       <div class="linha"><span>Último backup</span><span id="bkUltimo">—</span></div>
-      <div class="linha"><span>Pasta extra</span><span id="bkPasta" style="word-break:break-all; text-align:right;">nenhuma</span></div>
     </div>
-    <p style="font-size:0.8rem;">O Syvo faz um backup sozinho por dia, ao abrir. Escolha uma pasta do iCloud, Google Drive ou OneDrive para a cópia sair deste computador.</p>
+    <p style="font-size:0.8rem;">O Syvo faz um backup sozinho por dia, ao abrir, e guarda os 30 mais recentes neste computador. Antes de formatar ou trocar de máquina, exporte uma cópia.</p>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn-secondary" id="btnBkPasta" style="flex:1; margin-top:0;">Escolher pasta</button>
+      <button class="btn-secondary" id="btnBkExportar" style="flex:1; margin-top:0;">Exportar backup</button>
       <button class="btn-secondary" id="btnBkAgora" style="flex:1; margin-top:0;">Fazer backup agora</button>
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
