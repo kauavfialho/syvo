@@ -20,3 +20,6 @@ dist/
 tmp/
 .cache/
 .vscode/
+
+# Anotações locais do Claude Code
+CLAUDE.md
