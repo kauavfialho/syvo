@@ -16,7 +16,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          # as maquinas mac arm64 do github vivem sem vaga e o job era cancelado sem nem comecar.
+          # a intel monta os dois instaladores do mesmo jeito.
+          - os: macos-15-intel
             comando: dist:mac
             instalador: dist/*.dmg
             conferencia: dist/latest-mac.yml
