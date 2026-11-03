@@ -6,6 +6,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { DatabaseSync } = require('node:sqlite');
 const { abrirBanco, executar } = require('./banco');
+const { criarAtualizador } = require('./atualizacao');
 
 const PASTA_APP = path.join(__dirname, '..', 'app');
 const ORIGEM = 'app://syvo';
@@ -21,6 +22,7 @@ protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: t
 
 let janela = null;
 let db = null;
+let atualizador = null;
 const caminhoBanco = () => path.join(app.getPath('userData'), 'syvo.db');
 const pastaBackupInterna = () => path.join(app.getPath('userData'), 'backups');
 const pastaAnexosTemp = () => path.join(app.getPath('temp'), 'syvo-anexos');
@@ -115,6 +117,9 @@ function atender(canal, fn){
 function registrarPontes(){
   atender('banco:executar', d => executar(db, d));
   atender('app:versao', () => app.getVersion());
+  atender('atualizacao:estado', () => atualizador.estado());
+  atender('atualizacao:verificar', () => atualizador.verificar());
+  atender('atualizacao:instalar', () => atualizador.instalar());
   atender('banco:mostrar', () => { shell.showItemInFolder(caminhoBanco()); });
 
   atender('backup:estado', () => {
@@ -243,9 +248,12 @@ if(!app.requestSingleInstanceLock()){
     db = abrirBanco(caminhoBanco());
     try { backupDoDia(); } catch(e){ console.warn('backup do dia falhou', e); }
     session.defaultSession.setPermissionRequestHandler((_wc, permissao, responder) => responder(permissao === 'notifications'));
+    // copia de seguranca antes de instalar versao nova: o banco pode migrar na abertura seguinte
+    atualizador = criarAtualizador({ janela: () => janela, antesDeInstalar: () => backupAgora(), sair: () => app.quit() });
     registrarProtocolo();
     registrarPontes();
     criarJanela();
+    atualizador.iniciar();
     app.on('activate', () => { if(BrowserWindow.getAllWindows().length === 0) criarJanela(); });
   });
 

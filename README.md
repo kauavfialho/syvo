@@ -22,6 +22,12 @@ xattr -cr /Applications/Syvo.app
 
 **Windows:** abra o `.exe`. Na tela azul do SmartScreen, clique em "Mais informações" e depois em "Executar assim mesmo".
 
+## Atualizações
+
+O app confere o GitHub ao abrir e a cada 6 horas. Quando há versão nova, ele avisa e mostra o botão **Atualizar agora**: baixa, confere o arquivo, faz um backup, troca o app e abre de novo. Também dá para checar em **Verificar atualizações**, no menu.
+
+No Mac, o Syvo precisa estar na pasta Aplicativos.
+
 ## Seus dados e backups
 
 O banco fica em um arquivo `syvo.db`, e o caminho aparece em **Dados e backup**, no menu do app. Desinstalar o app não apaga esse arquivo.

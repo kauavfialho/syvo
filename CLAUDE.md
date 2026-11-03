@@ -49,7 +49,9 @@ Teste a tela de verdade antes de dar por pronto. Para rodar sem encostar nos dad
 ## Publicar versão
 
 Suba `version` no `package.json` e publique uma tag `v*`: `.github/workflows/instaladores.yml` testa, gera
-`.dmg` e `.exe` e cria a Release. Instaladores sem certificado (uso próprio).
+`.dmg`, `.exe` e os `latest*.yml` e cria a Release. Instaladores sem certificado (uso próprio).
+O app instalado acha a Release sozinho (`electron/atualizacao.js`, constante `REPOSITORIO`). O repositório das
+Releases precisa ser público. Só nome `vX.Y.Z` conta como versão, e os `latest*.yml` têm que ir junto.
 
 ## Pendências
 

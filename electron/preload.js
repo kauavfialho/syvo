@@ -16,5 +16,10 @@ contextBridge.exposeInMainWorld('syvoNativo', {
   irAnexos: ano => ipcRenderer.invoke('ir:anexos', ano),
   irAbrirAnexo: id => ipcRenderer.invoke('ir:abrir-anexo', id),
   irRemoverAnexo: id => ipcRenderer.invoke('ir:remover-anexo', id),
+  atualizacaoEstado: () => ipcRenderer.invoke('atualizacao:estado'),
+  atualizacaoVerificar: () => ipcRenderer.invoke('atualizacao:verificar'),
+  atualizacaoInstalar: () => ipcRenderer.invoke('atualizacao:instalar'),
+  aoAtualizacaoDisponivel: fn => ipcRenderer.on('atualizacao:disponivel', (_e, d) => fn(d)),
+  aoAtualizacaoProgresso: fn => ipcRenderer.on('atualizacao:progresso', (_e, d) => fn(d)),
   versao: () => ipcRenderer.invoke('app:versao')
 });

@@ -66,6 +66,7 @@
               <button class="wm-item" id="btnAbrirPerfil" data-i18n="wm.perfil">Meu perfil</button>
               <button class="wm-item" id="btnAbrirConfig" data-i18n="wm.config">Configurações</button>
               <button class="wm-item" id="btnAbrirSeguranca">Dados e backup</button>
+              <button class="wm-item" id="btnVerificarAtualizacao">Verificar atualizações</button>
               <button class="wm-item" id="btnMostrarGuia" data-i18n="wm.guia">Primeiros passos</button>
               <button class="wm-item" id="btnTema">Modo escuro</button>
               
@@ -75,6 +76,14 @@
       </div>
     </div>
   </header>
+
+  <div class="notif-banner hidden" id="atualizacaoBanner">
+    <span class="notif-banner-txt" id="atualizacaoTexto"></span>
+    <div class="notif-banner-acoes">
+      <button type="button" class="notif-banner-btn sim" id="atualizacaoSim">Atualizar agora</button>
+      <button type="button" class="notif-banner-btn nao" id="atualizacaoNao">Depois</button>
+    </div>
+  </div>
 
   <!-- aviso de permissao de notificacao, aparece uma vez ao abrir -->
   <div class="notif-banner hidden" id="notifBanner">
@@ -1155,5 +1164,6 @@
 <script src="js/app.js"></script>
 <script src="js/ir-calculo.js"></script>
 <script src="js/ir.js"></script>
+<script src="js/atualizacao.js"></script>
 </body>
 </html>

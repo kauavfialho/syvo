@@ -20,17 +20,40 @@
     "appId": "com.kauafialho.syvo",
     "productName": "Syvo",
     "artifactName": "Syvo-${version}-${os}-${arch}.${ext}",
-    "directories": { "output": "dist", "buildResources": "build" },
-    "files": ["electron/**", "app/**", "build/icon.png", "package.json"],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**",
+      "app/**",
+      "build/icon.png",
+      "package.json"
+    ],
     "mac": {
       "category": "public.app-category.finance",
-      "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
       "identity": "-",
       "hardenedRuntime": false,
       "gatekeeperAssess": false
     },
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "signAndEditExecutable": true
     },
     "nsis": {

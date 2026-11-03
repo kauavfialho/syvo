@@ -18,10 +18,12 @@ jobs:
         include:
           - os: macos-latest
             comando: dist:mac
-            arquivos: dist/*.dmg
+            instalador: dist/*.dmg
+            conferencia: dist/latest-mac.yml
           - os: windows-latest
             comando: dist:win
-            arquivos: dist/*.exe
+            instalador: dist/*.exe
+            conferencia: dist/latest.yml
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +37,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: instalador-${{ matrix.os }}
-          path: ${{ matrix.arquivos }}
+          # o yml traz o sha512 que o app confere antes de instalar uma versao nova
+          path: |
+            ${{ matrix.instalador }}
+            ${{ matrix.conferencia }}
           if-no-files-found: error
 
   publicar:
