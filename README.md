@@ -1,5 +1,7 @@
 # Syvo
 
+**🌐 Idioma:** **Português** | [English](https://github.com/kauavfialho/syvo/blob/main/README.en.md)
+
 App de computador para organizar o dinheiro do mês, o patrimônio e o imposto de renda. Funciona no Mac e no Windows, sem login e sem servidor: os dados ficam em um arquivo no próprio computador.
 
 A ideia é ajudar qualquer pessoa, da criança ao avô, a cuidar do próprio dinheiro de forma fácil e gratuita. O app foi gerado por inteligência artificial, a partir de uma ideia de Kauã Fialho.
