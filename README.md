@@ -75,4 +75,4 @@ npm test
 
 Para gerar uma versão nova, atualize `version` no `package.json` e publique uma tag `v*`. O GitHub Actions monta os instaladores e cria a Release.
 
-O `index.html` da raiz é o site antigo, guardado para um uso futuro. A versão mais recente do site, com Supabase, está na branch `site-web`. Nenhum dos dois entra no app.
+As versões antigas do site continuam no histórico do Git.
