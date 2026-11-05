@@ -10,7 +10,7 @@ const path = require('node:path');
 const { promisify } = require('node:util');
 const rodar = promisify(execFile);
 
-const REPOSITORIO = 'kauavfialho/syvo-solution';
+const REPOSITORIO = 'kauavfialho/syvo';
 const CHECAR_A_CADA_MS = 6 * 60 * 60 * 1000;
 
 function partesVersao(v){

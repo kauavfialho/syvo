@@ -12,21 +12,21 @@ Clique no arquivo do seu computador e o download começa na hora. O link sempre 
 
 | Computador | Download |
 |---|---|
-| Windows 64 bits | [⬇️ Baixar para Windows (.exe)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-win-x64.exe) |
-| Mac com chip Apple (M1, M2, M3 ou mais novo) | [⬇️ Baixar para Mac Apple (.dmg)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-mac-arm64.dmg) |
-| Mac com processador Intel | [⬇️ Baixar para Mac Intel (.dmg)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-mac-x64.dmg) |
+| Windows 64 bits | [⬇️ Baixar para Windows (.exe)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-win-x64.exe) |
+| Mac com chip Apple (M1, M2, M3 ou mais novo) | [⬇️ Baixar para Mac Apple (.dmg)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-arm64.dmg) |
+| Mac com processador Intel | [⬇️ Baixar para Mac Intel (.dmg)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-x64.dmg) |
 
 ### Portátil (usa sem instalar)
 
 | Computador | Download |
 |---|---|
-| Windows 64 bits | [⬇️ Baixar portátil para Windows (.exe)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-win-x64-portable.exe) |
-| Mac com chip Apple (M1, M2, M3 ou mais novo) | [⬇️ Baixar portátil para Mac Apple (.zip)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-mac-arm64.zip) |
-| Mac com processador Intel | [⬇️ Baixar portátil para Mac Intel (.zip)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-mac-x64.zip) |
+| Windows 64 bits | [⬇️ Baixar portátil para Windows (.exe)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-win-x64-portable.exe) |
+| Mac com chip Apple (M1, M2, M3 ou mais novo) | [⬇️ Baixar portátil para Mac Apple (.zip)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-arm64.zip) |
+| Mac com processador Intel | [⬇️ Baixar portátil para Mac Intel (.zip)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-x64.zip) |
 
 Não sabe qual é o seu Mac? Clique na maçã, no canto da tela, e depois em **Sobre Este Mac**. No Windows, os arquivos são para sistemas de 64 bits, que é o padrão dos computadores atuais. Não há versão para Windows 32 bits.
 
-Veja [todas as versões](https://github.com/kauavfialho/syvo-solution/releases).
+Veja [todas as versões](https://github.com/kauavfialho/syvo/releases).
 
 O app não tem certificado pago, então o sistema avisa na primeira vez.
 
