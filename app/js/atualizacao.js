@@ -49,7 +49,7 @@
       const r = await nativo.atualizacaoVerificar();
       if(r.disponivel){ mostrar(r.disponivel); return; }
       fecharFaixa();
-      if(r.semSuporte) alert('A busca só funciona no app instalado.');
+      if(r.semSuporte) alert('A busca automática só funciona na versão instalada. Na portátil, baixe o arquivo novo no GitHub.');
       else if(r.semAcesso) alert('Não consegui ler as versões publicadas no GitHub. O repositório precisa ser público para o app verificar sozinho.');
       else alert(`Você já está na versão mais recente (${r.versaoAtual}).`);
     } catch(e){

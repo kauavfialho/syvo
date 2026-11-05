@@ -16,6 +16,8 @@ const ANEXO_EXTENSOES = ['pdf', 'png', 'jpg', 'jpeg'];
 
 // teste automatico aponta pra uma pasta descartavel e nao encosta no banco de verdade
 if(process.env.SYVO_PASTA_DADOS) app.setPath('userData', process.env.SYVO_PASTA_DADOS);
+// versao portatil do windows: os dados andam junto com o programa, ao lado do .exe
+else if(process.env.PORTABLE_EXECUTABLE_DIR) app.setPath('userData', path.join(process.env.PORTABLE_EXECUTABLE_DIR, 'Syvo-dados'));
 
 // app:// em vez de file:// pra tela ter origem propria e o localStorage ficar estavel
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { standard: true, secure: true, supportFetchAPI: true } }]);

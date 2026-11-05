@@ -112,7 +112,8 @@ rm -rf "$4"
 function criarAtualizador({ janela, antesDeInstalar, sair }){
   // o teste automatico aponta pra um servidor local. em uso normal, sempre o github.
   const urlRelease = process.env.SYVO_URL_ATUALIZACAO || `https://api.github.com/repos/${REPOSITORIO}/releases/latest`;
-  const ativo = app.isPackaged || !!process.env.SYVO_URL_ATUALIZACAO;
+  // a portatil nao tem instalacao para trocar: atualiza baixando o arquivo novo
+  const ativo = (app.isPackaged && !process.env.PORTABLE_EXECUTABLE_DIR) || !!process.env.SYVO_URL_ATUALIZACAO;
   let disponivel = null;
   let instalando = false;
 

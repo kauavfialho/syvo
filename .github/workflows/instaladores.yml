@@ -21,10 +21,12 @@ jobs:
           - os: macos-15-intel
             comando: dist:mac
             instalador: dist/*.dmg
+            portatil: dist/*.zip
             conferencia: dist/latest-mac.yml
           - os: windows-latest
             comando: dist:win
             instalador: dist/*.exe
+            portatil: dist/*-portable.exe
             conferencia: dist/latest.yml
     runs-on: ${{ matrix.os }}
     steps:
@@ -42,6 +44,7 @@ jobs:
           # o yml traz o sha512 que o app confere antes de instalar uma versao nova
           path: |
             ${{ matrix.instalador }}
+            ${{ matrix.portatil }}
             ${{ matrix.conferencia }}
           if-no-files-found: error
 
@@ -61,4 +64,4 @@ jobs:
           gh release create "$GITHUB_REF_NAME" instaladores/* \
             --repo "$GITHUB_REPOSITORY" \
             --title "Syvo $GITHUB_REF_NAME" \
-            --notes "Baixe o .dmg para Mac ou o .exe para Windows. Veja o README para abrir o app na primeira vez."
+            --notes "Baixe o instalador (.dmg no Mac, .exe no Windows) ou a versão portátil (.zip no Mac, -portable.exe no Windows). Veja o README para abrir o app na primeira vez."

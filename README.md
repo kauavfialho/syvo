@@ -14,6 +14,18 @@ Baixe o instalador na página [Releases](https://github.com/kauavfialho/syvo-sol
 | Mac com Intel | `Syvo-x.x.x-mac-x64.dmg` |
 | Windows | `Syvo-x.x.x-win-x64.exe` |
 
+Também há versões portáteis, que não precisam de instalação:
+
+| Sistema | Arquivo | Como usar |
+|---|---|---|
+| Windows | `Syvo-x.x.x-win-x64-portable.exe` | Coloque em uma pasta e abra. Os dados ficam na pasta `Syvo-dados`, ao lado do programa. |
+| Mac com Apple Silicon | `Syvo-x.x.x-mac-arm64.zip` | Descompacte e abra o app. |
+| Mac com Intel | `Syvo-x.x.x-mac-x64.zip` | Descompacte e abra o app. |
+
+Na versão portátil de Windows, a atualização é manual: baixe o arquivo novo e coloque no lugar do antigo, mantendo a pasta `Syvo-dados`. No Mac, os dados ficam na pasta padrão do sistema.
+
+Prefere ter todos os aplicativos em um lugar só? Use o [Vital Solutions](https://github.com/kauavfialho/vital-solutions), que instala, abre e atualiza o Syvo.
+
 O app não tem certificado pago, então o sistema avisa na primeira vez.
 
 **Mac:** abra o `.dmg` e arraste o Syvo para Aplicativos. Se aparecer um aviso de que o app não pode ser aberto, vá em Ajustes do Sistema, Privacidade e Segurança, e clique em "Abrir Mesmo Assim". Se o aviso disser que o app está danificado, rode no Terminal:
