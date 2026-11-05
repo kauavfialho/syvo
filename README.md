@@ -26,7 +26,7 @@ xattr -cr /Applications/Syvo.app
 
 ## Atualizações
 
-O app confere o GitHub ao abrir e a cada 6 horas. Quando há versão nova, ele avisa e mostra o botão **Atualizar agora**: baixa, confere o arquivo, faz um backup, troca o app e abre de novo. Também dá para checar em **Verificar atualizações**, no menu.
+O app confere o GitHub ao abrir e a cada 6 horas. Quando há versão nova, ele avisa e mostra o botão **Atualizar agora**: baixa, confere o arquivo, faz um backup, troca o app e abre de novo. Também dá para checar em **Buscar atualização**, no menu.
 
 No Mac, o Syvo precisa estar na pasta Aplicativos.
 
@@ -43,6 +43,7 @@ O mesmo backup funciona no Mac e no Windows. Os dados não são sincronizados so
 
 - **Metas:** escolha quanto quer guardar no mês e no ano. O Início mostra quanto já sobrou e quanto falta.
 - **Aprender:** 100 dicas para organizar, economizar, cortar gastos, juntar dinheiro e lidar com dívidas. As dicas são educativas e não são recomendação de investimento.
+- **Aprender a investir:** explica, em linguagem simples, risco, prazo e cada tipo de investimento, como LCI, LCA, CDB, caixinha e Tesouro, além de sinais de golpe. É um guia educativo e não indica produtos.
 - **Tamanho da letra:** em **Configurações**, escolha entre normal, grande e muito grande.
 
 ## Imposto de renda

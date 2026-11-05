@@ -58,13 +58,14 @@
                 <div class="avatar" id="waffleAvatar">?</div>
                 <div class="wm-info">
                   <div class="wm-nome" id="waffleNome">—</div>
-                                </div>
+                </div>
+              </div>
               <div class="wm-aviso hidden" id="waffleAviso" data-i18n="wm.aviso">Complete seu perfil para aproveitar melhor o Syvo.</div>
               <button class="wm-item" id="btnCartoes" data-i18n="header.cartoes">Meus cartões</button>
               <button class="wm-item" id="btnAbrirPerfil" data-i18n="wm.perfil">Meu perfil</button>
               <button class="wm-item" id="btnAbrirConfig" data-i18n="wm.config">Configurações</button>
               <button class="wm-item" id="btnAbrirSeguranca">Dados e backup</button>
-              <button class="wm-item" id="btnVerificarAtualizacao">Verificar atualizações</button>
+              <button class="wm-item" id="btnVerificarAtualizacao">Buscar atualização</button>
               <button class="wm-item" id="btnMostrarGuia" data-i18n="wm.guia">Primeiros passos</button>
               <button class="wm-item" id="btnTema">Modo escuro</button>
               
@@ -821,9 +822,28 @@
   <div id="view-sobre" class="hidden">
     <section class="sobre-pagina">
       <h2>Sobre o Syvo</h2>
-      <p>O Syvo é uma ideia de Kauã Fialho: um projeto open source para qualquer pessoa ter controle financeiro de forma fácil e gratuita.</p>
-      <p>O aplicativo foi gerado por inteligência artificial.</p>
-      <p>Seus dados ficam só neste computador. Não tem conta, login nem servidor.</p>
+      <p class="sobre-abertura">O Syvo é um aplicativo gratuito para ajudar qualquer pessoa a cuidar do próprio dinheiro, sem precisar entender de finanças.</p>
+
+      <h3>Por que ele existe</h3>
+      <p>Muita gente chega à vida adulta sem nunca ter aprendido a lidar com dinheiro. Não é falta de capacidade: quase ninguém ensina. Sem isso, fica mais fácil gastar sem perceber, cair em uma dívida cara ou em um golpe.</p>
+
+      <h3>Para quem é</h3>
+      <p>Para todo mundo, da criança que está aprendendo a guardar a mesada até quem começou a usar computador mais tarde na vida. Por isso a letra pode ser aumentada, os botões dizem o que fazem e os textos evitam palavras difíceis.</p>
+
+      <h3>O que dá para fazer</h3>
+      <ul>
+        <li>Ver quanto entra, quanto sai e quanto sobra em cada mês.</li>
+        <li>Acompanhar cartões, contas e o que você tem guardado.</li>
+        <li>Definir metas de quanto guardar no mês e no ano.</li>
+        <li>Aprender com 100 dicas e com um guia de investimentos para iniciantes.</li>
+        <li>Organizar o imposto de renda durante o ano.</li>
+      </ul>
+
+      <h3>Como ele funciona</h3>
+      <p>Seus dados ficam só neste computador. Não tem conta, login nem servidor, e o Syvo não vê o que você lança. A internet só é usada para buscar a cotação de moedas e procurar atualizações.</p>
+      <p>O Syvo é open source: o código é aberto, e qualquer pessoa pode usar, estudar e melhorar. O aplicativo foi gerado por inteligência artificial.</p>
+      <p class="sobre-nota">O Syvo ajuda a organizar e a aprender, mas não substitui um profissional e não recomenda investimentos.</p>
+
       <p><a href="https://github.com/kauavfialho/syvo-solution" target="_blank" rel="noopener">Ver o código e baixar no GitHub</a></p>
       <p class="sobre-versao" id="sobreVersao"></p>
     </section>
@@ -1112,6 +1132,8 @@
 <script src="js/metas-calculo.js"></script>
 <script src="js/metas.js"></script>
 <script src="js/dicas.js"></script>
+<script src="js/investimentos.js"></script>
+<script src="js/investir.js"></script>
 <script src="js/aprender.js"></script>
 <script src="js/facil.js"></script>
 </body>

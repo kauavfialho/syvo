@@ -6,6 +6,7 @@
   let busca = '';
   let feitas = new Set();
   let desenhado = false;
+  let modo = 'dicas';
   const semAcento = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
   // muda uma vez por dia, sempre a mesma dica no dia
@@ -45,8 +46,14 @@
     raiz.innerHTML = `
       <section class="apr-topo">
         <h2>Aprender sobre dinheiro</h2>
-        <p>Dicas curtas para organizar, economizar e juntar dinheiro. Comece por uma só.</p>
+        <p>Dicas curtas e um guia para quem nunca investiu. Comece por uma coisa só.</p>
       </section>
+      <div class="apr-modos">
+        <button type="button" data-apr-modo="dicas">💡 100 dicas</button>
+        <button type="button" data-apr-modo="investir">🌱 Aprender a investir</button>
+      </div>
+      <div id="aprInvestir" class="hidden"></div>
+      <div id="aprDicas">
       <section class="apr-hoje">
         <span class="apr-hoje-rotulo">💡 Dica de hoje</span>
         <h3>${escapeHTML(hoje.titulo)}</h3>
@@ -67,9 +74,21 @@
       </nav>
       <p class="apr-contagem" id="aprContagem" aria-live="polite"></p>
       <div class="apr-lista" id="aprLista"></div>
-      <p class="apr-nota">Estas dicas são educativas e gerais. Não são recomendação de investimento. Regras e serviços podem mudar, então confirme nos canais oficiais antes de decidir.</p>`;
+      <p class="apr-nota">Estas dicas são educativas e gerais. Não são recomendação de investimento. Regras e serviços podem mudar, então confirme nos canais oficiais antes de decidir.</p>
+      </div>`;
+    document.getElementById('aprInvestir').innerHTML = investirHTML();
     document.getElementById('aprBusca').addEventListener('input', e => { busca = e.target.value; desenharLista(); });
     desenhado = true;
+  }
+
+  function mostrarModo(){
+    document.getElementById('aprDicas').classList.toggle('hidden', modo !== 'dicas');
+    document.getElementById('aprInvestir').classList.toggle('hidden', modo !== 'investir');
+    document.querySelectorAll('[data-apr-modo]').forEach(b => {
+      const ativa = b.dataset.aprModo === modo;
+      b.classList.toggle('ativa', ativa);
+      b.setAttribute('aria-pressed', ativa ? 'true' : 'false');
+    });
   }
 
   window.aprenderAbrir = async function(){
@@ -78,9 +97,12 @@
     feitas = new Set((data || []).map(d => d.dica_id));
     if(!desenhado) desenharEstrutura();
     desenharLista();
+    mostrarModo();
   };
 
   raiz.addEventListener('click', e => {
+    const m = e.target.closest('[data-apr-modo]');
+    if(m){ modo = m.dataset.aprModo; mostrarModo(); window.scrollTo({ top:0, behavior:'smooth' }); return; }
     const b = e.target.closest('[data-apr-cat]');
     if(!b) return;
     categoria = b.dataset.aprCat;

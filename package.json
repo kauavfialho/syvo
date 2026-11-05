@@ -1,7 +1,7 @@
 {
   "name": "syvo",
   "productName": "Syvo",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Syvo - controle financeiro pessoal com banco local",
   "main": "electron/main.js",
   "author": "Kauã Fialho",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "electron .",
     "test": "node --test testes/*.test.js",
-    "dist:mac": "electron-builder --mac --publish never",
+    "dist:mac": "electron-builder --mac --publish never && node -e \"for(const d of ['dist/mac','dist/mac-arm64'])require('fs').rmSync(d,{recursive:true,force:true})\"",
     "dist:win": "electron-builder --win --publish never"
   },
   "devDependencies": {

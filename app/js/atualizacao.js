@@ -40,14 +40,21 @@
 
   document.getElementById('btnVerificarAtualizacao').addEventListener('click', async () => {
     document.getElementById('waffleMenu').classList.add('hidden');
+    texto.textContent = 'Buscando atualização...';
+    btnSim.classList.add('hidden');
+    btnNao.classList.add('hidden');
+    faixa.classList.remove('hidden');
+    const fecharFaixa = () => faixa.classList.add('hidden');
     try {
       const r = await nativo.atualizacaoVerificar();
-      if(r.semSuporte) alert('A verificação só funciona no app instalado.');
+      if(r.disponivel){ mostrar(r.disponivel); return; }
+      fecharFaixa();
+      if(r.semSuporte) alert('A busca só funciona no app instalado.');
       else if(r.semAcesso) alert('Não consegui ler as versões publicadas no GitHub. O repositório precisa ser público para o app verificar sozinho.');
-      else if(r.disponivel) mostrar(r.disponivel);
       else alert(`Você já está na versão mais recente (${r.versaoAtual}).`);
     } catch(e){
-      alert('Não consegui verificar agora. Confira a internet e tente de novo.');
+      fecharFaixa();
+      alert('Não consegui buscar agora. Confira a internet e tente de novo.');
     }
   });
 })();
