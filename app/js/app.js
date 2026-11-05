@@ -206,19 +206,6 @@ const TRADUCOES = {
     'nav.fluxo': 'Home',
     'nav.patrimonio': 'Minha carteira',
     'nav.sobre': 'Sobre',
-    'sobre.titulo': 'Sobre o Syvo',
-    'sobre.p1': 'Syvo nasceu para ser um jeito simples e honesto de acompanhar o dinheiro do mês: renda, contas, gastos e o que ainda está por vir.',
-    'sobre.p2': 'Cada real que sobra pode ganhar um destino nos seus ativos, e o assistente embutido roda inteiramente no seu computador — sem IA na nuvem, sem seus dados saindo daqui.',
-    'sobre.p3': 'Um projeto pessoal, feito aos poucos, mês após mês.',
-    'footer.tag': 'Feito para organizar sua vida financeira, um mês de cada vez.',
-    'footer.sobreTitulo': 'Sobre o Syvo',
-    'footer.sobre1': 'Um jeito simples e honesto de acompanhar o dinheiro do mês: renda, contas, gastos e o que ainda está por vir.',
-    'footer.sobre2': 'Cada real que sobra ganha um destino nos seus ativos. Um projeto pessoal, feito aos poucos.',
-    'footer.privTitulo': 'Privacidade',
-    'footer.priv1': 'O assistente roda inteiramente no seu computador — sem IA na nuvem.',
-    'footer.priv2': 'Seus dados ficam só neste computador, em um arquivo do Syvo.',
-    'footer.navTitulo': 'Navegar',
-    'footer.base': '© 2026 Syvo · Todos os dados são seus.',
     'tab.renda': 'Renda',
     'tab.contas': 'Contas',
     'tab.gastos': 'Gastos',
@@ -270,19 +257,6 @@ const TRADUCOES = {
     'nav.fluxo': 'Home',
     'nav.patrimonio': 'My wallet',
     'nav.sobre': 'About',
-    'sobre.titulo': 'About Syvo',
-    'sobre.p1': 'Syvo was built to be a simple, honest way to track the month\'s money: income, bills, expenses, and what\'s still coming in.',
-    'sobre.p2': 'Every leftover dollar can be given a destination among your assets, and the built-in assistant runs entirely in your browser — no cloud AI, no data leaving this page.',
-    'sobre.p3': 'A personal project, built bit by bit, month after month.',
-    'footer.tag': 'Built to organize your finances, one month at a time.',
-    'footer.sobreTitulo': 'About Syvo',
-    'footer.sobre1': 'A simple, honest way to track the month\'s money: income, bills, expenses, and what\'s still coming in.',
-    'footer.sobre2': 'Every leftover dollar gets a destination among your assets. A personal project, built bit by bit.',
-    'footer.privTitulo': 'Privacy',
-    'footer.priv1': 'O assistente roda inteiramente no seu computador — sem IA na nuvem.',
-    'footer.priv2': 'Seus dados ficam só neste computador, em um arquivo do Syvo.',
-    'footer.navTitulo': 'Navigate',
-    'footer.base': '© 2026 Syvo · All your data is yours.',
     'tab.renda': 'Income',
     'tab.contas': 'Bills',
     'tab.gastos': 'Expenses',
@@ -334,19 +308,6 @@ const TRADUCOES = {
     'nav.fluxo': 'Home',
     'nav.patrimonio': 'Mi cartera',
     'nav.sobre': 'Acerca de',
-    'sobre.titulo': 'Acerca de Syvo',
-    'sobre.p1': 'Syvo nació para ser una forma simple y honesta de seguir el dinero del mes: ingresos, cuentas, gastos y lo que aún está por llegar.',
-    'sobre.p2': 'Cada real que sobra puede tener un destino entre tus activos, y el asistente integrado funciona por completo en tu ordenador — sin IA en la nube, sin que tus datos salgan de aquí.',
-    'sobre.p3': 'Un proyecto personal, hecho poco a poco, mes tras mes.',
-    'footer.tag': 'Hecho para organizar tus finanzas, un mes a la vez.',
-    'footer.sobreTitulo': 'Acerca de Syvo',
-    'footer.sobre1': 'Una forma simple y honesta de seguir el dinero del mes: ingresos, cuentas, gastos y lo que aún está por llegar.',
-    'footer.sobre2': 'Cada real que sobra tiene un destino entre tus activos. Un proyecto personal, hecho poco a poco.',
-    'footer.privTitulo': 'Privacidad',
-    'footer.priv1': 'O assistente roda inteiramente no seu computador — sem IA na nuvem.',
-    'footer.priv2': 'Seus dados ficam só neste computador, em um arquivo do Syvo.',
-    'footer.navTitulo': 'Navegar',
-    'footer.base': '© 2026 Syvo · Todos tus datos son tuyos.',
     'tab.renda': 'Ingresos',
     'tab.contas': 'Cuentas',
     'tab.gastos': 'Gastos',
@@ -455,7 +416,6 @@ if(document.readyState === 'loading'){
 // o settimeout espera o arquivo inteiro ser lido, senao as funcoes la de baixo ainda nao existem.
 async function iniciarApp(){
   document.body.classList.add('logged-in');
-  document.getElementById('chatBolha').classList.remove('hidden');
   requestAnimationFrame(() => {
     const ativo = document.querySelector('.view-btn.active');
     if(ativo) moverIndicadorNav(ativo);
@@ -535,35 +495,26 @@ function moverIndicadorNav(btn){
 }
 
 function irParaView(view){
-  if(view === 'sobre'){
-    const footer = document.getElementById('siteFooter');
-    if(footer) footer.scrollIntoView({ behavior:'smooth', block:'start' });
-    return;
-  }
   document.querySelectorAll('.view-btn').forEach(b => {
-    if(b.dataset.view === 'sobre') return; // "Sobre" nunca fica marcado como ativo
     b.classList.toggle('active', b.dataset.view === view);
   });
   document.getElementById('view-mensal').classList.toggle('hidden', view !== 'mensal');
   document.getElementById('view-patrimonio').classList.toggle('hidden', view !== 'patrimonio');
   document.getElementById('view-ir').classList.toggle('hidden', view !== 'ir');
+  document.getElementById('view-sobre').classList.toggle('hidden', view !== 'sobre');
+  document.getElementById('view-aprender').classList.toggle('hidden', view !== 'aprender');
   const ativo = document.querySelector(`.view-btn[data-view="${view}"]`);
   if(ativo) moverIndicadorNav(ativo);
   window.scrollTo({ top:0, behavior:'smooth' });
   if(view === 'patrimonio') renderPatrimonio();
   if(view === 'ir') irAbrir();
+  if(view === 'aprender') aprenderAbrir();
+  if(view === 'sobre') window.syvoNativo.versao().then(v => { document.getElementById('sobreVersao').textContent = 'Versão ' + v; });
 }
 
 document.querySelectorAll('.view-btn').forEach(btn => {
   btn.addEventListener('click', () => irParaView(btn.dataset.view));
 });
-
-const footerNavEl = document.getElementById('footerNav');
-if(footerNavEl){
-  footerNavEl.querySelectorAll('button[data-view]').forEach(btn => {
-    btn.addEventListener('click', () => irParaView(btn.dataset.view));
-  });
-}
 
 window.addEventListener('load', () => {
   const ativo = document.querySelector('.view-btn.active') || document.querySelector('.view-btn');
@@ -798,8 +749,8 @@ async function deleteEntry(id){
 // botao de marcar pago (conta, ou gasto com prazo). antes o "paga/pendente" aparecia mas nao tinha como mudar.
 function botaoPago(item, palavra){
   return item.pago
-    ? `<button class="icon-btn" data-action="toggle" data-id="${item.id}" data-pago="true" title="Marquei sem querer: voltar para pendente">↩</button>`
-    : `<button class="icon-btn toggle" data-action="toggle" data-id="${item.id}" data-pago="false" title="Marcar como ${palavra}">✓</button>`;
+    ? `<button class="icon-btn" data-action="toggle" data-id="${item.id}" data-pago="true" title="Marquei sem querer: voltar para pendente">↩ Desfazer</button>`
+    : `<button class="icon-btn toggle" data-action="toggle" data-id="${item.id}" data-pago="false" title="Marcar como ${palavra}">✓ Marcar</button>`;
 }
 
 async function toggleContaPaga(id, pagoAtual){
@@ -897,8 +848,8 @@ function renderListaCartoes(){
     }
     return `<li><div><div><span class="card-dot" style="background:${c.cor || COR_PADRAO_CARTAO};"></span>${escapeHTML(c.nome)}</div><div class="card-tipo">${escapeHTML(c.tipo)} · ${usoTxt}</div></div>
      <div class="row-actions">
-       <button class="icon-btn" data-action="edit-cartao" data-id="${c.id}">✎</button>
-       <button class="icon-btn" data-action="del-cartao" data-id="${c.id}">✕</button>
+       <button class="icon-btn" data-action="edit-cartao" data-id="${c.id}">✎ Editar</button>
+       <button class="icon-btn" data-action="del-cartao" data-id="${c.id}">✕ Excluir</button>
      </div></li>`;
   }).join('');
 }
@@ -1173,8 +1124,8 @@ function renderRenda(){
     li.innerHTML = `<div class="info"><div class="desc-line"><span class="name">${escapeHTML(item.desc)}</span><span class="leader"></span>${tagFixa}</div></div>
       <span class="valor income">${badgeCotacao(item)}${formatMoeda(item.valor, item.moeda)}</span>
       <div class="row-actions">
-        <button class="icon-btn" data-action="edit" data-col="renda" data-id="${item.id}">✎</button>
-        <button class="icon-btn" data-action="del" data-col="renda" data-id="${item.id}">✕</button>
+        <button class="icon-btn" data-action="edit" data-col="renda" data-id="${item.id}">✎ Editar</button>
+        <button class="icon-btn" data-action="del" data-col="renda" data-id="${item.id}">✕ Excluir</button>
       </div>`;
     ul.appendChild(li);
   });
@@ -1240,8 +1191,8 @@ function renderContas(){
       <span class="valor expense">${badgeCotacao(item)}${formatMoeda(item.valor, item.moeda)}</span>
       <div class="row-actions">
         ${botaoPago(item, 'paga')}
-        <button class="icon-btn" data-action="edit" data-col="contas" data-id="${item.id}">✎</button>
-        <button class="icon-btn" data-action="del" data-col="contas" data-id="${item.id}">✕</button>
+        <button class="icon-btn" data-action="edit" data-col="contas" data-id="${item.id}">✎ Editar</button>
+        <button class="icon-btn" data-action="del" data-col="contas" data-id="${item.id}">✕ Excluir</button>
       </div>`;
     ul.appendChild(li);
   });
@@ -1336,7 +1287,7 @@ function renderGastos(){
         const rotulo = nums.length === 1 ? `a parcela ${nums[0]}` : `as parcelas ${nums.join(', ')}`;
         disclaimer = `<div class="parcela-disclaimer parcela-disclaimer-ativa"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:2px;"><polyline points="7 6 13 12 7 18"></polyline><polyline points="14 6 20 12 14 18"></polyline></svg>Você antecipou aqui ${rotulo} · <button type="button" class="link-desfazer-antecipacao" data-grupo="${item.grupoParcelamento}">desfazer</button></div>`;
       }
-      btnAntecipar = `<button class="icon-btn" data-action="antecipar" data-grupo="${item.grupoParcelamento}" data-id="${item.id}" title="Antecipar parcelas"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 6 13 12 7 18"></polyline><polyline points="14 6 20 12 14 18"></polyline></svg></button>`;
+      btnAntecipar = `<button class="icon-btn" data-action="antecipar" data-grupo="${item.grupoParcelamento}" data-id="${item.id}" title="Antecipar parcelas"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 6 13 12 7 18"></polyline><polyline points="14 6 20 12 14 18"></polyline></svg> Antecipar</button>`;
     }
 
     const valorHtml = tachadaAqui
@@ -1348,8 +1299,8 @@ function renderGastos(){
       : `<div class="row-actions">
         ${item.dataPrevista ? botaoPago(item, 'pago') : ''}
         ${btnAntecipar}
-        <button class="icon-btn" data-action="edit" data-col="gastos" data-id="${item.id}">✎</button>
-        <button class="icon-btn" data-action="del" data-col="gastos" data-id="${item.id}">✕</button>
+        <button class="icon-btn" data-action="edit" data-col="gastos" data-id="${item.id}">✎ Editar</button>
+        <button class="icon-btn" data-action="del" data-col="gastos" data-id="${item.id}">✕ Excluir</button>
       </div>`;
 
     const gastoVencido = estaVencido(item, item.pago === true);
@@ -1436,9 +1387,9 @@ function renderReceber(){
         <div class="meta">${escapeHTML(item.origem || '')} · previsto para ${nomeMes}/${ano}</div></div>
       <span class="valor pending">${badgeCotacao(item)}${formatMoeda(item.valor, item.moeda)}</span>
       <div class="row-actions">
-        <button class="icon-btn toggle" title="Marcar como recebido" data-action="toggle-recebido" data-id="${item.id}" data-recebido="false">✓</button>
-        <button class="icon-btn" data-action="edit" data-col="receber" data-id="${item.id}" data-atrasado="1">✎</button>
-        <button class="icon-btn" data-action="del" data-col="receber" data-id="${item.id}">✕</button>
+        <button class="icon-btn toggle" title="Marcar como recebido" data-action="toggle-recebido" data-id="${item.id}" data-recebido="false">✓ Recebi</button>
+        <button class="icon-btn" data-action="edit" data-col="receber" data-id="${item.id}" data-atrasado="1">✎ Editar</button>
+        <button class="icon-btn" data-action="del" data-col="receber" data-id="${item.id}">✕ Excluir</button>
       </div>`;
     ul.appendChild(li);
   });
@@ -1459,9 +1410,9 @@ function renderReceber(){
 
     const acoes = recebido
       ? `<button class="btn-retornar" data-action="toggle-recebido" data-id="${item.id}" data-recebido="true" title="Marquei sem querer — voltar para Aguardando">↩ Retornar</button>`
-      : `<button class="icon-btn toggle" title="Marcar como recebido" data-action="toggle-recebido" data-id="${item.id}" data-recebido="false">✓</button>
-         <button class="icon-btn" data-action="edit" data-col="receber" data-id="${item.id}">✎</button>
-         <button class="icon-btn" data-action="del" data-col="receber" data-id="${item.id}">✕</button>`;
+      : `<button class="icon-btn toggle" title="Marcar como recebido" data-action="toggle-recebido" data-id="${item.id}" data-recebido="false">✓ Recebi</button>
+         <button class="icon-btn" data-action="edit" data-col="receber" data-id="${item.id}">✎ Editar</button>
+         <button class="icon-btn" data-action="del" data-col="receber" data-id="${item.id}">✕ Excluir</button>`;
 
     let notaRecebimento = '';
     if(recebido && item.mesRecebido && item.mesRecebido !== item.mes){
@@ -1594,6 +1545,11 @@ function acaoBlocoResumo(acao){
 
 // monta o resumo do topo. uma moeda mostra direto; varias viram seletor + 'convertido'.
 function renderSummary(){
+  renderResumoTela();
+  if(typeof renderMetas === 'function') renderMetas();
+}
+
+function renderResumoTela(){
   const painel = document.getElementById('resumoPainel');
   const moedas = moedasEmUso();
   const base = moedaAtual();
@@ -2832,8 +2788,8 @@ function linhaAtivoHtml(item){
     </div>
     <span class="ativo-valor">${formatBRL(valor)}</span>
     <div class="ativo-acoes">
-      ${spec ? `<button class="icon-btn" data-action="edit-ativo" data-id="${item.id}" title="Editar" aria-label="Editar ${nome}">✎</button>` : ''}
-      <button class="icon-btn" data-action="del-ativo" data-id="${item.id}" title="Excluir" aria-label="Excluir ${nome}">✕</button>
+      ${spec ? `<button class="icon-btn" data-action="edit-ativo" data-id="${item.id}" title="Editar" aria-label="Editar ${nome}">✎ Editar</button>` : ''}
+      <button class="icon-btn" data-action="del-ativo" data-id="${item.id}" title="Excluir" aria-label="Excluir ${nome}">✕ Excluir</button>
     </div>
   </div>`;
 }
@@ -2950,8 +2906,8 @@ function cardAtivoHtml(item){
     <div class="ac-valor">${formatBRL(valor)}</div>
     ${infoHtml}
     <div class="ac-actions">
-      <button class="icon-btn" data-action="edit-ativo" data-id="${item.id}">✎</button>
-      <button class="icon-btn" data-action="del-ativo" data-id="${item.id}">✕</button>
+      <button class="icon-btn" data-action="edit-ativo" data-id="${item.id}">✎ Editar</button>
+      <button class="icon-btn" data-action="del-ativo" data-id="${item.id}">✕ Excluir</button>
     </div>
   </div>`;
 }
@@ -3172,8 +3128,8 @@ function renderPatrimonio(){
       <div class="ac-valor">${formatBRL(valor)}</div>
       ${infoHtml}
       <div class="ac-actions">
-        <button class="icon-btn" data-action="edit-ativo" data-id="${item.id}">✎</button>
-        <button class="icon-btn" data-action="del-ativo" data-id="${item.id}">✕</button>
+        <button class="icon-btn" data-action="edit-ativo" data-id="${item.id}">✎ Editar</button>
+        <button class="icon-btn" data-action="del-ativo" data-id="${item.id}">✕ Excluir</button>
       </div>
     </div>`;
   }).join('');
@@ -4610,8 +4566,8 @@ function renderVencimentos(){
     const g = grupoDe(data);
     if(g !== ultimoGrupo){ html += `<div class="venc-grupo${g === 'Atrasado' ? ' atrasado' : ''}">${g}</div>`; ultimoGrupo = g; }
     const acao = sentido === 'pagar'
-      ? `<button class="icon-btn toggle" data-action="toggle" data-id="${i.id}" data-pago="false" title="Marcar como pago">✓</button>`
-      : `<button class="icon-btn toggle" data-action="toggle-recebido" data-id="${i.id}" data-recebido="false" title="Marcar como recebido">✓</button>`;
+      ? `<button class="icon-btn toggle" data-action="toggle" data-id="${i.id}" data-pago="false" title="Marcar como pago">✓ Paguei</button>`
+      : `<button class="icon-btn toggle" data-action="toggle-recebido" data-id="${i.id}" data-recebido="false" title="Marcar como recebido">✓ Recebi</button>`;
     html += `<div class="venc-item">
       <div class="venc-data"><strong>${String(data.getDate()).padStart(2,'0')}</strong><span>${DIAS_SEMANA[data.getDay()]}</span></div>
       <div class="venc-txt"><strong>${escapeHTML(i.desc || 'Sem descrição')}</strong><span>${sentido === 'pagar' ? (i.tipo === 'contas' ? 'Conta a pagar' : 'Gasto a pagar') : 'A receber'}</span></div>
@@ -5407,16 +5363,7 @@ async function loadChartData(){
 let perfilCache = {};
 
 function nomeExibicao(){
-  if(perfilCache.nome) return perfilCache.nome;
-  if(currentUser && currentUser.displayName) return currentUser.displayName;
-  if(perfilCache.email) return perfilCache.email;
-  if(currentUser && currentUser.email) return currentUser.email;
-  if(perfilCache.telefone) return perfilCache.telefone;
-  return 'Sem nome';
-}
-
-function emailExibicao(){
-  return perfilCache.email || (currentUser && currentUser.email) || perfilCache.telefone || '—';
+  return perfilCache.nome || 'Sem nome';
 }
 
 function iniciaisDe(texto){
@@ -5431,7 +5378,7 @@ function perfilIncompleto(){
 }
 
 function fotoDoPerfil(){
-  return perfilCache.fotoData || perfilCache.fotoURL || (currentUser && currentUser.photoURL) || '';
+  return perfilCache.fotoData || '';
 }
 
 function pintarAvatar(el){
@@ -5446,7 +5393,6 @@ function pintarAvatar(el){
 
 function renderWaffle(){
   document.getElementById('waffleNome').textContent = nomeExibicao();
-  document.getElementById('waffleEmail').textContent = emailExibicao();
   pintarAvatar(document.getElementById('waffleAvatar'));
   const incompleto = perfilIncompleto();
   document.getElementById('waffleAlerta').classList.toggle('hidden', !incompleto);
@@ -5454,29 +5400,13 @@ function renderWaffle(){
 }
 
 async function carregarPerfil(){
-  if(!currentUser) return;
-  const meta = currentUser.user_metadata || {};
-  const googleNome = meta.full_name || meta.name || '';
-  const googleFoto = meta.avatar_url || meta.picture || '';
   try {
-    const { data, error } = await sb.from('perfis').select('*').eq('id', currentUser.id).single();
-    if(error && error.code !== 'PGRST116') throw error;
-    const d = data || {};
-    perfilCache = {
-      nome: d.nome || googleNome || '',
-      email: d.email || currentUser.email || '',
-      telefone: d.telefone || '',
-      sexo: d.sexo || '',
-      nascimento: d.nascimento || '',
-      fotoData: d.foto_data || '',                      // foto enviada (Base64)
-      fotoURL: d.foto_url || googleFoto || ''           // foto do Google (interna)
-    };
-    if((!d.foto_url) && googleFoto){
-      sb.from('perfis').update({ foto_url: googleFoto }).eq('id', currentUser.id).then(()=>{}).catch(()=>{});
-    }
+    const { data, error } = await sb.from('perfis').select('nome, foto_data').eq('id', currentUser.id).single();
+    if(error) throw error;
+    perfilCache = { nome: data.nome || '', fotoData: data.foto_data || '' };
   } catch(err){
     console.error('Erro ao carregar perfil', err);
-    perfilCache = { nome: googleNome, email: currentUser.email || '' };
+    perfilCache = {};
   }
   renderWaffle();
 }
@@ -5503,10 +5433,6 @@ function abrirPerfil(){
   waffleMenuEl.classList.add('hidden');
   fotoNovaData = undefined;
   document.getElementById('perfil-nome').value = perfilCache.nome || '';
-  document.getElementById('perfil-email').value = perfilCache.email || (currentUser ? currentUser.email : '') || '';
-  document.getElementById('perfil-telefone').value = perfilCache.telefone || '';
-  document.getElementById('perfil-sexo').value = perfilCache.sexo || '';
-  document.getElementById('perfil-nascimento').value = perfilCache.nascimento || '';
   document.getElementById('erroPerfil').textContent = '';
   pintarAvatar(document.getElementById('perfilAvatar'));
   atualizarBotoesFoto();
@@ -5867,28 +5793,18 @@ document.getElementById('perfil-nome').addEventListener('input', e => {
 document.getElementById('formPerfil').addEventListener('submit', async e => {
   e.preventDefault();
   const nome = document.getElementById('perfil-nome').value.trim();
-  const email = document.getElementById('perfil-email').value.trim();
   if(!nome){
     document.getElementById('erroPerfil').textContent = 'O nome é obrigatório.';
     return;
   }
-  const dados = {
-    nome,
-    email: email || null,
-    telefone: document.getElementById('perfil-telefone').value.trim() || null,
-    sexo: document.getElementById('perfil-sexo').value || null,
-    nascimento: document.getElementById('perfil-nascimento').value || null
-  };
+  const dados = { nome };
   if(fotoNovaData !== undefined){
     dados.foto_data = fotoNovaData;   // string (nova) ou null (removida)
   }
   try {
     const { error } = await sb.from('perfis').update(dados).eq('id', currentUser.id);
     if(error) throw error;
-    perfilCache = Object.assign({}, perfilCache, {
-      nome: dados.nome, email: dados.email, telefone: dados.telefone,
-      sexo: dados.sexo, nascimento: dados.nascimento
-    });
+    perfilCache = Object.assign({}, perfilCache, { nome: dados.nome });
     if(fotoNovaData !== undefined) perfilCache.fotoData = fotoNovaData || '';
     renderWaffle();
     document.getElementById('modalPerfil').classList.add('hidden');
@@ -6349,505 +6265,3 @@ document.getElementById('csv-arquivo').addEventListener('change', e => {
   reader.readAsText(file);
   e.target.value = '';
 });
-
-const MESES_PROJECAO = 12;
-
-async function projetarFluxo(){
-  if(!currentUser) return [];
-  const inicio = startOfMonth(new Date());
-  const inicioKey = monthKey(inicio);
-  const fimKey = monthKey(addMonths(inicio, MESES_PROJECAO));
-
-  let qPF = tabLanc().select('*').gte('mes', mesParaData(inicioKey)).lte('mes', mesParaData(fimKey));
-  if(perfilAtivoId) qPF = qPF.eq('perfil_id', perfilAtivoId);
-  const { data: _rowsPF, error: _ePF } = await qPF;
-  if(_ePF){ console.error('Erro ao projetar fluxo', _ePF); }
-
-  const meses = {};
-  for(let i = 0; i <= MESES_PROJECAO; i++){
-    meses[monthKey(addMonths(inicio, i))] = { renda:0, receber:0, contas:0, gastos:0 };
-  }
-  (_rowsPF || []).forEach(row => {
-    const d = lancDoBanco(row);
-    const m = meses[d.mes];
-    if(!m) return;
-    const v = Number(d.valor) || 0;
-    if(d.tipo === 'renda') m.renda += v;
-    else if(d.tipo === 'receber'){ if(d.recebido !== true) m.receber += v; }
-    else if(d.tipo === 'contas') m.contas += v;
-    else if(d.tipo === 'gastos') m.gastos += v;
-  });
-
-  return Object.keys(meses).sort().map(mk => {
-    const m = meses[mk];
-    const entradas = m.renda + m.receber;
-    const saidas = m.contas + m.gastos;
-    return { mk, entradas, saidas, folga: entradas - saidas, renda:m.renda, receber:m.receber, contas:m.contas, gastos:m.gastos };
-  });
-}
-
-function nomeMesChat(mk){
-  const [ano, mes] = mk.split('-').map(Number);
-  return MESES[mes-1] + '/' + ano;
-}
-
-async function analisarParcelamento(valorTotal, parcelas){
-  const proj = await projetarFluxo();
-  if(proj.length === 0) return { erro: 'sem_dados' };
-
-  const parcela = valorTotal / parcelas;
-
-  const folgasConhecidas = proj.map(m => m.folga);
-  const baseEstimativa = folgasConhecidas.length > 3
-    ? folgasConhecidas.slice(1)   // ignora o mês corrente
-    : folgasConhecidas;
-  const folgaEstimada = baseEstimativa.length
-    ? baseEstimativa.reduce((s,f) => s+f, 0) / baseEstimativa.length
-    : 0;
-
-  const folgaDoMes = idx => idx < proj.length ? proj[idx].folga : folgaEstimada;
-  const mkDoMes = idx => idx < proj.length ? proj[idx].mk : null;
-
-  const candidatos = [];
-  for(let inicio = 0; inicio < proj.length; inicio++){
-    let cabeEmTodos = true, piorFolga = Infinity, temEstimativa = false;
-    const detalhamento = [];
-    for(let p = 0; p < parcelas; p++){
-      const idx = inicio + p;
-      const folga = folgaDoMes(idx);
-      const mk = mkDoMes(idx);
-      if(idx >= proj.length) temEstimativa = true;
-      const folgaApos = folga - parcela;
-      detalhamento.push({ mk, folga, folgaApos, estimado: idx >= proj.length });
-      if(folgaApos < 0) cabeEmTodos = false;
-      piorFolga = Math.min(piorFolga, folgaApos);
-    }
-    candidatos.push({
-      mk: proj[inicio].mk, cabeEmTodos,
-      piorFolga: piorFolga === Infinity ? null : piorFolga,
-      temEstimativa, detalhamento
-    });
-  }
-
-  const cabem = candidatos.filter(c => c.cabeEmTodos);
-  const melhor = cabem.length > 0 ? cabem[0]
-    : candidatos.slice().sort((a,b) => (b.piorFolga||-Infinity) - (a.piorFolga||-Infinity))[0];
-
-  return { parcela, valorTotal, parcelas, proj, candidatos, cabem, melhor, folgaEstimada };
-}
-
-function extrairNumeros(txt){
-  const t = txt.toLowerCase().replace(/\./g,'').replace(/,/g,'.');
-  let parcelas = null;
-  const mp = t.match(/(\d+)\s*(x|vezes|parcelas|parcela)/);
-  if(mp) parcelas = parseInt(mp[1], 10);
-  const nums = (t.match(/\d+(\.\d+)?/g) || []).map(Number);
-  let valor = null;
-  if(nums.length){
-    const semParcela = nums.filter(n => n !== parcelas);
-    const pool = semParcela.length ? semParcela : nums;
-    valor = Math.max(...pool);
-  }
-  return { valor, parcelas };
-}
-
-// o cerebro do assistente por regras. descobre o que a pergunta quer. tudo local.
-function chatIntencao(txt){
-  const t = txt.toLowerCase();
-  if(/gastar menos|economizar|cortar gasto|reduzir gasto|onde.*(cort|economi)/.test(t)) return 'economizar';
-  if(/(est[ãa]o|s[ãa]o|quais|meus|tenho|tem).*(parcelad|parcelament)|parcelament.*(atual|ativ|em aberto|andamento)|o que.*parcel/.test(t)) return 'consultar_parcelas';
-  if(/(entrada|sa[íi]da|receita|balan[çc]o).*(ano|anual)|(ano|anual).*(entrada|sa[íi]da|receita|balan[çc]o)|esse ano|este ano|no ano/.test(t)) return 'ano';
-  if(/m[êe]s.*(mais|maior).*gast|maior.*gasto.*m[êe]s|onde.*mais.*gast/.test(t)) return 'mes_mais';
-  if(/m[êe]s.*(menos|menor).*gast|menor.*gasto.*m[êe]s|onde.*menos.*gast/.test(t)) return 'mes_menos';
-  if(/(comprometer|estourar|apertar).*(cr[ée]dito|cart|limite)|(cr[ée]dito|cart|limite).*(comprometer|estourar|apertar)|sem comprometer/.test(t)) return 'credito_compra';
-  if(/posso parcelar|d[áa] pra parcelar|consigo parcelar|parcelar (uma|um|o|a|em)|em \d+\s*x|\d+\s*vezes|quero comprar|posso comprar|melhor m[êe]s.*compr|financi/.test(t)) return 'parcelamento';
-  if(/quanto.*(sobr|folga|livre)|saldo|sobra/.test(t)) return 'folga';
-  if(/quanto.*(gast|sa[ií])|maior.*gast|onde.*gast/.test(t)) return 'gastos';
-  if(/venc|conta.*(prox|atras)|pagar/.test(t)) return 'contas';
-  if(/ajuda|o que voc[êe]|como voc[êe]|pode fazer/.test(t)) return 'ajuda';
-  if(/(compr|m[áa]quina|geladeira|celular|tv|notebook).*\d|\d.*(compr|m[áa]quina|geladeira)/.test(t)) return 'parcelamento';
-  return 'desconhecido';
-}
-
-async function responderParcelamento(txt){
-  const { valor, parcelas } = extrairNumeros(txt);
-  if(!valor) return 'Me diga o <strong>valor</strong> e em <strong>quantas vezes</strong>. Ex: "posso parcelar uma geladeira de 2400 em 10x?"';
-  const nParcelas = parcelas || 1;
-  const r = await analisarParcelamento(valor, nParcelas);
-  if(r.erro === 'sem_dados') return 'Ainda não tenho lançamentos suficientes para projetar. Cadastre sua renda e contas fixas primeiro.';
-
-  const cab = `Uma compra de <strong>${formatBRL(valor)}</strong> em <strong>${nParcelas}x</strong> = parcelas de <strong>${formatBRL(r.parcela)}</strong>.\n\n`;
-
-  if(r.cabem.length > 0){
-    const m = r.melhor;
-    const menorFolga = Math.min(...m.detalhamento.map(d => d.folgaApos));
-    const nota = m.temEstimativa ? '\n\n<em>Obs: parte das parcelas cai além do que já está lançado; para esses meses usei uma estimativa da sua folga média.</em>' : '';
-    return cab +
-      `✅ Melhor mês para começar: <span class="msg-destaque">${nomeMesChat(m.mk)}</span>.\n\n` +
-      `Todas as ${nParcelas} parcelas cabem na folga de cada mês. No mês mais apertado, ainda sobrariam <strong>${formatBRL(menorFolga)}</strong> depois da parcela.` +
-      (r.cabem.length > 1 ? `\n\nTambém caberia a partir de: ${r.cabem.slice(1,4).map(c => nomeMesChat(c.mk)).join(', ')}.` : '\n\nFoi o único início em que todas cabem com folga.') +
-      nota;
-  }
-  const m = r.melhor;
-  return cab +
-    `⚠️ <span class="msg-alerta">Em nenhum mês todas as parcelas cabem</span> sem apertar.\n\n` +
-    `O início menos apertado seria <strong>${nomeMesChat(m.mk)}</strong>, mas em algum mês faltariam <strong>${formatBRL(Math.abs(m.piorFolga))}</strong>.\n\n` +
-    `Ideias: aumentar o nº de parcelas (baixa o valor de cada uma) ou reduzir gastos nos meses envolvidos.`;
-}
-
-async function responderFolga(){
-  const proj = await projetarFluxo();
-  if(proj.length === 0) return 'Ainda não há dados suficientes para calcular sua folga.';
-  const linhas = proj.slice(0,6).map(m =>
-    `${nomeMesChat(m.mk)}: <span class="${m.folga>=0?'msg-destaque':'msg-alerta'}">${formatBRL(m.folga)}</span>`
-  ).join('\n');
-  return 'Folga projetada (entradas − saídas):\n\n' + linhas + '\n\nÉ o que sobra depois de contas e gastos já lançados.';
-}
-
-async function responderGastos(){
-  const proj = await projetarFluxo();
-  const m = proj[0];
-  if(!m) return 'Ainda não há gastos lançados neste mês.';
-  return `Neste mês (${nomeMesChat(m.mk)}):\n\n` +
-    `Contas: <strong>${formatBRL(m.contas)}</strong>\nGastos: <strong>${formatBRL(m.gastos)}</strong>\n` +
-    `Saídas totais: <strong>${formatBRL(m.saidas)}</strong>\nEntradas: <strong>${formatBRL(m.entradas)}</strong>\n` +
-    `Folga: <span class="${m.folga>=0?'msg-destaque':'msg-alerta'}">${formatBRL(m.folga)}</span>`;
-}
-
-async function responderContas(){
-  const contas = (entriesCache.contas || []).filter(c => !c.pago && c.dia);
-  if(contas.length === 0) return 'Não há contas pendentes com vencimento neste mês.';
-  const ord = contas.slice().sort((a,b) => (a.dia||0)-(b.dia||0));
-  const linhas = ord.slice(0,8).map(c => `Dia ${c.dia}: ${escapeHTML(c.desc)} — ${formatBRL(c.valor)}`).join('\n');
-  const total = ord.reduce((s,c)=>s+(Number(c.valor)||0),0);
-  return `Contas pendentes neste mês:\n\n${linhas}\n\nTotal: <strong>${formatBRL(total)}</strong>`;
-}
-
-function respostaAjuda(){
-  return 'Analiso o seu Fluxo. Posso ajudar com:\n\n' +
-    '• <strong>Parcelamentos</strong>: "posso parcelar uma TV de 3000 em 12x?"\n' +
-    '• <strong>Compra no crédito</strong>: "quero comprar algo de 2000, em que mês sem comprometer o cartão?"\n' +
-    '• <strong>Gastar menos</strong>: "como posso gastar menos esse mês?"\n' +
-    '• <strong>Balanço do ano</strong>: "quanto tive de entradas e saídas esse ano?"\n' +
-    '• <strong>Extremos</strong>: "qual mês eu mais gastei?" / "qual mês eu menos gastei?"\n' +
-    '• <strong>Folga</strong>: "quanto sobra nos próximos meses?"\n' +
-    '• <strong>Contas</strong>: "quais contas vencem?"\n\n' +
-    'Tudo no seu computador, sem enviar dados para ninguém.';
-}
-
-let chatPendente = null;   // guarda perguntas de acompanhamento (qual cartão? qual ano?)
-
-async function carregarTodosLancamentos(){
-  if(!currentUser) return [];
-  const { data, error } = await tabLanc().select('*');
-  if(error){ console.error('Erro ao ler lançamentos (chat)', error); return []; }
-  return (data || []).map(lancDoBanco);
-}
-
-async function responderEconomizar(){
-  const mkAtual = monthKey(startOfMonth(new Date()));
-  const proj = await projetarFluxo();
-  const mesAtual = proj[0];
-  const gastos = (entriesCache.gastos || []);
-  const contas = (entriesCache.contas || []);
-  if(gastos.length === 0 && contas.length === 0){
-    return 'Você ainda não tem gastos lançados neste mês, então não há o que cortar por enquanto. 🙂';
-  }
-  const porCategoria = {};
-  gastos.forEach(g => {
-    const cat = g.categoria || 'Sem categoria';
-    porCategoria[cat] = (porCategoria[cat] || 0) + (Number(g.valor) || 0);
-  });
-  const ranking = Object.entries(porCategoria).sort((a,b) => b[1]-a[1]);
-  let resp = `Analisando <strong>${nomeMesChat(mkAtual)}</strong>:\n\n`;
-  if(ranking.length > 0){
-    resp += 'Suas maiores categorias de gasto:\n';
-    resp += ranking.slice(0,4).map((r,i) => `${i+1}. ${escapeHTML(r[0])}: <strong>${formatBRL(r[1])}</strong>`).join('\n');
-    const maior = ranking[0];
-    resp += `\n\n💡 O maior peso está em <strong>${escapeHTML(maior[0])}</strong>. Reduzir 20% aí já economizaria <span class="msg-destaque">${formatBRL(maior[1]*0.2)}</span> no mês.`;
-  }
-  const avulsas = contas.filter(c => c.recorrente !== true);
-  if(avulsas.length > 0){
-    const totalAvulsas = avulsas.reduce((s,c) => s + (Number(c.valor)||0), 0);
-    resp += `\n\nVocê também tem ${avulsas.length} conta(s) avulsa(s) somando <strong>${formatBRL(totalAvulsas)}</strong> — vale conferir se todas são necessárias este mês.`;
-  }
-  if(mesAtual && mesAtual.folga < 0){
-    resp += `\n\n⚠️ <span class="msg-alerta">Seu mês está no vermelho (${formatBRL(mesAtual.folga)})</span>. Cortar nas categorias acima ajuda a equilibrar.`;
-  }
-  return resp;
-}
-
-async function responderAno(){
-  const ano = new Date().getFullYear();
-  const todos = await carregarTodosLancamentos();
-  const doAno = todos.filter(l => (l.mes || '').startsWith(ano + '-'));
-  if(doAno.length === 0) return `Ainda não há lançamentos em ${ano}.`;
-  let entradas = 0, saidas = 0, renda = 0, receber = 0, contas = 0, gastos = 0;
-  doAno.forEach(l => {
-    const v = Number(l.valor) || 0;
-    if(l.tipo === 'renda'){ renda += v; entradas += v; }
-    else if(l.tipo === 'receber'){ if(l.recebido === true){ receber += v; entradas += v; } }
-    else if(l.tipo === 'contas'){ contas += v; saidas += v; }
-    else if(l.tipo === 'gastos'){ gastos += v; saidas += v; }
-  });
-  const saldo = entradas - saidas;
-  return `Balanço de <strong>${ano}</strong> (até agora):\n\n` +
-    `Entradas: <span class="msg-destaque">${formatBRL(entradas)}</span>\n` +
-    `  • Renda: ${formatBRL(renda)}\n  • Recebido: ${formatBRL(receber)}\n\n` +
-    `Saídas: <span class="msg-alerta">${formatBRL(saidas)}</span>\n` +
-    `  • Contas: ${formatBRL(contas)}\n  • Gastos: ${formatBRL(gastos)}\n\n` +
-    `Resultado do ano: <span class="${saldo>=0?'msg-destaque':'msg-alerta'}">${formatBRL(saldo)}</span>`;
-}
-
-async function responderMesExtremo(qual, anoEscolhido){
-  const todos = await carregarTodosLancamentos();
-  const saidas = todos.filter(l => l.tipo === 'gastos' || l.tipo === 'contas');
-  if(saidas.length === 0) return 'Ainda não há gastos ou contas lançados para comparar.';
-  const anos = [...new Set(saidas.map(l => (l.mes||'').slice(0,4)).filter(Boolean))].sort();
-  if(anos.length > 1 && !anoEscolhido){
-    chatPendente = { tipo: qual === 'mais' ? 'mes_mais' : 'mes_menos', anos };
-    return `Você tem dados de mais de um ano (${anos.join(', ')}). De qual ano você quer saber? Responda com o ano (ex: ${anos[anos.length-1]}).`;
-  }
-  const ano = anoEscolhido || anos[anos.length-1] || String(new Date().getFullYear());
-  const porMes = {};
-  saidas.filter(l => (l.mes||'').startsWith(ano + '-')).forEach(l => {
-    porMes[l.mes] = (porMes[l.mes] || 0) + (Number(l.valor) || 0);
-  });
-  const entradas = Object.entries(porMes);
-  if(entradas.length === 0) return `Não há gastos lançados em ${ano}.`;
-  entradas.sort((a,b) => qual === 'mais' ? b[1]-a[1] : a[1]-b[1]);
-  const [mkAlvo, valorAlvo] = entradas[0];
-  const rotulo = qual === 'mais' ? 'que você mais gastou' : 'que você menos gastou';
-  const classe = qual === 'mais' ? 'msg-alerta' : 'msg-destaque';
-  let resp = `Em <strong>${ano}</strong>, o mês ${rotulo} foi <span class="${classe}">${nomeMesChat(mkAlvo)}</span>, com <strong>${formatBRL(valorAlvo)}</strong> em saídas.`;
-  if(entradas.length > 1){
-    const media = entradas.reduce((s,e) => s+e[1], 0) / entradas.length;
-    resp += `\n\nMédia mensal do ano: ${formatBRL(media)} (${entradas.length} ${entradas.length===1?'mês':'meses'} com lançamentos).`;
-  }
-  return resp;
-}
-
-const RESERVA_LIMITE = 100;
-
-// responde 'posso comprar no credito?'. olha o limite livre e sugere o melhor mes.
-async function responderCreditoCompra(txt, cartaoIdEscolhido){
-  if(cartoesCache.length === 0){
-    return 'Você ainda não cadastrou cartões. Cadastre um em "Cartões" no topo, com o limite, para eu analisar.';
-  }
-  const comLimite = cartoesCache.filter(c => typeof c.limite === 'number' && c.limite > 0);
-  if(comLimite.length === 0){
-    return 'Nenhum dos seus cartões tem limite cadastrado. Informe o limite em "Meus cartões" para eu poder analisar.';
-  }
-
-  const nums = extrairNumeros(txt);
-  const compraPendente = (chatPendente && chatPendente.compra) ? chatPendente.compra : null;
-  const valorFinal = (compraPendente && compraPendente.valor) || nums.valor;
-  const parcelasFinal = (compraPendente && compraPendente.parcelas) || nums.parcelas || 1;
-
-  if(!valorFinal){
-    return 'Me diga o <strong>valor</strong> do item (e em quantas vezes, se parcelado). Ex: "quero comprar uma TV de 3000 em 6x sem comprometer meu crédito".';
-  }
-
-  let cartao = cartaoIdEscolhido ? comLimite.find(c => c.id === cartaoIdEscolhido) : null;
-  if(!cartao){
-    const tl = txt.toLowerCase();
-    cartao = comLimite.find(c => (c.nome||'').length > 2 && tl.includes((c.nome||'').toLowerCase()));
-  }
-  if(!cartao){
-    if(comLimite.length === 1){
-      cartao = comLimite[0];
-    } else {
-      chatPendente = { tipo: 'credito_compra', compra: { valor: valorFinal, parcelas: parcelasFinal }, cartoes: comLimite.map(c=>c.id) };
-      return `Em qual cartão? Você tem: ${comLimite.map(c => `<strong>${escapeHTML(c.nome)}</strong> (limite ${formatBRL(c.limite)})`).join(', ')}. Responda com o nome do cartão.`;
-    }
-  }
-
-  const parcela = valorFinal / parcelasFinal;
-  const inicio = startOfMonth(new Date());
-  const inicioKey = monthKey(inicio);
-  const fimKey = monthKey(addMonths(inicio, MESES_PROJECAO));
-  // "cabe no cartao?" olha o limite real, de todos os perfis
-  const { data: _rowsCC, error: _eCC } = await tabLanc().select('*').gte('mes', mesParaData(inicioKey)).lte('mes', mesParaData(fimKey));
-  if(_eCC){ console.error('Erro (crédito compra)', _eCC); }
-
-  const usoMes = {};
-  for(let i = 0; i <= MESES_PROJECAO; i++) usoMes[monthKey(addMonths(inicio, i))] = 0;
-  (_rowsCC || []).forEach(row => {
-    const d = lancDoBanco(row);
-    if(d.cartaoId !== cartao.id) return;
-    if(d.formaPagamento !== 'credito' && d.formaPagamento !== 'credito_parcelado') return;
-    if(d.tipo === 'contas' && d.recorrente === true && d.mes !== inicioKey) return;
-    if(usoMes[d.mes] !== undefined) usoMes[d.mes] += (Number(d.valor) || 0);
-  });
-
-  const mesesArr = Object.keys(usoMes).sort();
-  const candidatos = [];
-  for(let ini = 0; ini < mesesArr.length; ini++){
-    let cabe = true, piorSobra = Infinity, estimou = false;
-    for(let p = 0; p < parcelasFinal; p++){
-      const idx = ini + p;
-      const mk = mesesArr[idx];
-      let livre;
-      if(mk !== undefined){
-        livre = (cartao.limite - usoMes[mk]) - parcela;
-      } else {
-        livre = (cartao.limite - usoMes[inicioKey]) - parcela;
-        estimou = true;
-      }
-      if(livre < RESERVA_LIMITE) cabe = false;
-      piorSobra = Math.min(piorSobra, livre);
-    }
-    candidatos.push({ mk: mesesArr[ini], cabe, piorSobra, estimou });
-  }
-
-  const cabem = candidatos.filter(c => c.cabe);
-  const cab = `Analisando o <strong>${escapeHTML(cartao.nome)}</strong> (limite ${formatBRL(cartao.limite)}) para uma compra de <strong>${formatBRL(valorFinal)}</strong>${parcelasFinal>1?` em <strong>${parcelasFinal}x</strong> de ${formatBRL(parcela)}`:''}:\n\n`;
-  chatPendente = null;
-
-  if(cabem.length > 0){
-    const m = cabem[0];
-    const nota = m.estimou ? '\n\n<em>Obs: parte das parcelas cai além do que está lançado; estimei o uso futuro pelo padrão atual.</em>' : '';
-    return cab + `✅ Melhor mês para comprar: <span class="msg-destaque">${nomeMesChat(m.mk)}</span>.\n\n` +
-      `Em todos os meses da compra o limite não estoura e sobram pelo menos ${formatBRL(RESERVA_LIMITE)} livres. No mês mais apertado, sobrariam <strong>${formatBRL(m.piorSobra)}</strong> de limite.` + nota;
-  }
-  const m = candidatos.slice().sort((a,b) => b.piorSobra - a.piorSobra)[0];
-  return cab + `⚠️ <span class="msg-alerta">Em nenhum mês a compra cabe deixando ${formatBRL(RESERVA_LIMITE)} de folga no limite.</span>\n\n` +
-    `O mês menos apertado seria <strong>${nomeMesChat(m.mk)}</strong>` +
-    (m.piorSobra < 0 ? `, mas o limite estouraria em ${formatBRL(Math.abs(m.piorSobra))}.` : `, com só ${formatBRL(m.piorSobra)} sobrando (abaixo da folga de ${formatBRL(RESERVA_LIMITE)}).`) +
-    `\n\nIdeias: parcelar em mais vezes, usar outro cartão, ou aguardar parcelas atuais terminarem.`;
-}
-
-async function responderConsultarParcelas(){
-  const todos = await carregarTodosLancamentos();
-  const parcelas = todos.filter(l =>
-    l.grupoParcelamento || l.formaPagamento === 'credito_parcelado' || (l.parcelaAtual && l.parcelaTotal)
-  );
-  if(parcelas.length === 0){
-    return 'Você não tem nenhum gasto parcelado registrado no momento. Todos os seus lançamentos são à vista, no crédito simples, ou contas fixas.';
-  }
-
-  const grupos = {};
-  parcelas.forEach(p => {
-    const chave = p.grupoParcelamento || p.id;
-    if(!grupos[chave]) grupos[chave] = { desc: p.desc, total: p.parcelaTotal || 0, valorParcela: Number(p.valor)||0, valorTotalCompra: p.valorTotalCompra || 0, cartao: p.cartaoNome, itens: [] };
-    grupos[chave].itens.push(p);
-  });
-
-  const mkAtual = monthKey(startOfMonth(new Date()));
-  const linhas = Object.values(grupos).map(g => {
-    const ordenadas = g.itens.slice().sort((a,b) => (a.mes||'').localeCompare(b.mes||''));
-    const futuras = ordenadas.filter(i => (i.mes||'') >= mkAtual);
-    const pagas = ordenadas.filter(i => (i.mes||'') < mkAtual);
-    const total = g.total || ordenadas.length;
-    const parcelaAtualNum = pagas.length + 1;
-    const faltam = futuras.length;
-    const valorParcela = g.valorParcela;
-    const totalCompra = g.valorTotalCompra || (valorParcela * total);
-    const restante = faltam * valorParcela;
-    const cartaoTxt = g.cartao ? ` · ${escapeHTML(g.cartao)}` : '';
-    return `• <strong>${escapeHTML(g.desc || 'Compra parcelada')}</strong>${cartaoTxt}\n` +
-      `  ${total}x de ${formatBRL(valorParcela)} (total ${formatBRL(totalCompra)})\n` +
-      `  ${faltam > 0 ? `parcela ${Math.min(parcelaAtualNum,total)}/${total} · faltam ${faltam} (${formatBRL(restante)})` : 'quitado'}`;
-  });
-
-  const totalMensal = Object.values(grupos).reduce((s,g) => {
-    const temFutura = g.itens.some(i => (i.mes||'') >= mkAtual);
-    return s + (temFutura ? g.valorParcela : 0);
-  }, 0);
-
-  return `Você tem <strong>${Object.keys(grupos).length}</strong> compra(s) parcelada(s):\n\n` +
-    linhas.join('\n\n') +
-    `\n\nSoma das parcelas que ainda pesam por mês: <strong>${formatBRL(totalMensal)}</strong>.`;
-}
-
-async function processarPergunta(txt){
-  if(chatPendente){
-    const pend = chatPendente;
-    if(pend.tipo === 'mes_mais' || pend.tipo === 'mes_menos'){
-      const anoMatch = txt.match(/\b(20\d{2})\b/);
-      if(anoMatch && pend.anos.includes(anoMatch[1])){
-        chatPendente = null;
-        return await responderMesExtremo(pend.tipo === 'mes_mais' ? 'mais' : 'menos', anoMatch[1]);
-      }
-      chatPendente = null;
-    }
-    if(pend && pend.tipo === 'credito_compra'){
-      const tl = txt.toLowerCase();
-      const cartao = cartoesCache.find(c => pend.cartoes.includes(c.id) && (c.nome||'').length>2 && tl.includes((c.nome||'').toLowerCase()));
-      if(cartao){
-        return await responderCreditoCompra(txt, cartao.id);
-      }
-      chatPendente = null;
-    }
-  }
-
-  switch(chatIntencao(txt)){
-    case 'economizar': return await responderEconomizar();
-    case 'consultar_parcelas': return await responderConsultarParcelas();
-    case 'ano': return await responderAno();
-    case 'mes_mais': return await responderMesExtremo('mais');
-    case 'mes_menos': return await responderMesExtremo('menos');
-    case 'credito_compra': return await responderCreditoCompra(txt);
-    case 'parcelamento': return await responderParcelamento(txt);
-    case 'folga': return await responderFolga();
-    case 'gastos': return await responderGastos();
-    case 'contas': return await responderContas();
-    case 'ajuda': return respostaAjuda();
-    default: return 'Não entendi bem. Posso ajudar com: <strong>parcelamentos</strong>, <strong>compras no crédito</strong>, <strong>folga</strong>, <strong>como gastar menos</strong>, <strong>balanço do ano</strong>, <strong>mês que mais/menos gastou</strong> e <strong>contas a vencer</strong>. Digite "ajuda" para exemplos.';
-  }
-}
-
-function chatAddMensagem(texto, quem){
-  const wrap = document.getElementById('chatMensagens');
-  const div = document.createElement('div');
-  div.className = 'chat-msg ' + quem;
-  div.innerHTML = texto;
-  wrap.appendChild(div);
-  wrap.scrollTop = wrap.scrollHeight;
-  return div;
-}
-
-let chatIniciado = false;
-function iniciarChat(){
-  if(chatIniciado) return;
-  chatIniciado = true;
-  chatAddMensagem('Oi! 👋 Sou o assistente do Syvo. Posso analisar seu Fluxo e dizer, por exemplo, o melhor mês para parcelar uma compra sem apertar o orçamento.\n\nPergunte algo ou toque numa sugestão abaixo.', 'bot');
-  const wrap = document.getElementById('chatSugestoes');
-  const sug = ['Como gastar menos esse mês?', 'Posso parcelar 2400 em 10x?', 'Qual mês eu mais gastei?', 'Entradas e saídas do ano'];
-  wrap.innerHTML = sug.map(s => `<button class="chat-chip" type="button">${escapeHTML(s)}</button>`).join('');
-}
-
-async function enviarPergunta(txt){
-  txt = (txt || '').trim();
-  if(!txt) return;
-  chatAddMensagem(escapeHTML(txt), 'user');
-  document.getElementById('chatInput').value = '';
-  const carregando = chatAddMensagem('<em>analisando…</em>', 'bot');
-  try {
-    carregando.innerHTML = await processarPergunta(txt);
-  } catch(err){
-    carregando.innerHTML = 'Ops, tive um problema ao analisar. Tente de novo.';
-    console.error('Erro no chat', err);
-  }
-  document.getElementById('chatMensagens').scrollTop = document.getElementById('chatMensagens').scrollHeight;
-}
-
-document.getElementById('chatBolha').addEventListener('click', () => {
-  document.getElementById('chatPainel').classList.remove('hidden');
-  document.getElementById('chatBolha').classList.add('hidden');
-  iniciarChat();
-  document.getElementById('chatInput').focus();
-});
-document.getElementById('chatFechar').addEventListener('click', () => {
-  document.getElementById('chatPainel').classList.add('hidden');
-  document.getElementById('chatBolha').classList.remove('hidden');
-});
-document.getElementById('chatForm').addEventListener('submit', e => {
-  e.preventDefault();
-  enviarPergunta(document.getElementById('chatInput').value);
-});
-document.getElementById('chatSugestoes').addEventListener('click', e => {
-  const chip = e.target.closest('.chat-chip');
-  if(chip) enviarPergunta(chip.textContent);
-});
-

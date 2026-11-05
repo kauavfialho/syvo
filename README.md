@@ -2,6 +2,8 @@
 
 App de computador para organizar o dinheiro do mês, o patrimônio e o imposto de renda. Funciona no Mac e no Windows, sem login e sem servidor: os dados ficam em um arquivo no próprio computador.
 
+A ideia é ajudar qualquer pessoa, da criança ao avô, a cuidar do próprio dinheiro de forma fácil e gratuita. O app foi gerado por inteligência artificial, a partir de uma ideia de Kauã Fialho.
+
 ## Instalar
 
 Baixe o instalador na página [Releases](https://github.com/kauavfialho/syvo-solution/releases):
@@ -37,6 +39,12 @@ O banco fica em um arquivo `syvo.db`, que o botão **Mostrar arquivo do banco** 
 
 O mesmo backup funciona no Mac e no Windows. Os dados não são sincronizados sozinhos: para levar de um computador para o outro, restaure o backup.
 
+## Metas e aprendizado
+
+- **Metas:** escolha quanto quer guardar no mês e no ano. O Início mostra quanto já sobrou e quanto falta.
+- **Aprender:** 100 dicas para organizar, economizar, cortar gastos, juntar dinheiro e lidar com dívidas. As dicas são educativas e não são recomendação de investimento.
+- **Tamanho da letra:** em **Configurações**, escolha entre normal, grande e muito grande.
+
 ## Imposto de renda
 
 A aba reúne rendimentos, pagamentos, dependentes, bens, dívidas e comprovantes de cada ano. Ela compara a declaração simplificada com a completa, aponta o que falta conferir e gera um relatório em PDF para preencher o programa da Receita.
@@ -45,6 +53,10 @@ A aba reúne rendimentos, pagamentos, dependentes, bens, dívidas e comprovantes
 - Ganho de capital, operações em bolsa, atividade rural e tributação mínima de alta renda ficam fora do cálculo.
 - As regras de cada ano ficam em `app/js/ir-calculo.js`. Anos cadastrados: 2025 e 2026.
 - Os limites de obrigatoriedade da declaração de 2027 ainda precisam ser cadastrados.
+
+## Licença
+
+MIT. Pode usar, adaptar e distribuir, mantendo o aviso de licença. O app e as dicas são oferecidos sem garantia e não substituem um profissional.
 
 ## Desenvolvimento
 

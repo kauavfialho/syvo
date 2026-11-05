@@ -28,7 +28,9 @@ const TABELAS = {
     cotacao: 'real', data_prevista: 'txt', notificado_venc: 'txt', perfil_id: 'txt', adiada_de: 'txt'
   },
   // imposto de renda: uma linha por item de cada ano-calendario. os campos de cada ficha vao no json.
-  ir_itens: { ano: 'int', ficha: 'txt', descricao: 'txt', valor: 'din', dados: 'json', conferido: 'bool' }
+  ir_itens: { ano: 'int', ficha: 'txt', descricao: 'txt', valor: 'din', dados: 'json', conferido: 'bool' },
+  metas: { perfil_id: 'txt', tipo: 'txt', valor: 'din' },
+  dicas_feitas: { dica_id: 'int' }
 };
 for(const colunas of Object.values(TABELAS)){ colunas.id = 'txt'; colunas.criado_em = 'txt'; }
 
@@ -64,6 +66,9 @@ const MIGRACOES = [`
   -- comprovante fica dentro do banco, assim o backup leva junto
   create table ir_anexos (id text primary key, criado_em text not null, item_id text not null references ir_itens(id) on delete cascade, nome text not null, conteudo blob not null);
   create index idx_ir_anexo_item on ir_anexos(item_id);
+`, `
+  create table metas (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, tipo text not null check (tipo in ('mes', 'ano')), valor real not null check (valor > 0), unique (perfil_id, tipo));
+  create table dicas_feitas (id text primary key, criado_em text not null, dica_id integer not null unique);
 `];
 
 function abrirBanco(caminho){
@@ -269,4 +274,4 @@ function executar(db, d){
   }
 }
 
-module.exports = { abrirBanco, executar, TABELAS };
+module.exports = { abrirBanco, executar, TABELAS, MIGRACOES };
