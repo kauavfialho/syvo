@@ -1,7 +1,7 @@
 {
   "name": "syvo",
   "productName": "Syvo",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Syvo - controle financeiro pessoal com banco local",
   "main": "electron/main.js",
   "author": "Kauã Fialho",
@@ -20,7 +20,7 @@
   "build": {
     "appId": "com.kauafialho.syvo",
     "productName": "Syvo",
-    "artifactName": "Syvo-${version}-${os}-${arch}.${ext}",
+    "artifactName": "Syvo-${os}-${arch}.${ext}",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -77,7 +77,7 @@
       "deleteAppDataOnUninstall": false
     },
     "portable": {
-      "artifactName": "Syvo-${version}-win-${arch}-portable.${ext}"
+      "artifactName": "Syvo-${os}-${arch}-portable.${ext}"
     }
   }
 }

@@ -66,3 +66,9 @@ test('sem versao nova ou sem arquivo do sistema, nao oferece nada', () => {
   assert.strictEqual(interpretarRelease(soMac, 'win32', 'x64', '2.0.0'), null);
   assert.strictEqual(interpretarRelease({ tag_name: 'v2.0.1', assets: [ativo('Syvo-2.0.1-win-x64.exe')] }, 'win32', 'x64', '2.0.0'), null);
 });
+
+test('nome sem versao nao confunde instalador com portatil', () => {
+  const r = { tag_name: 'v3.0.0', assets: ['Syvo-win-x64-portable.exe', 'Syvo-win-x64.exe', 'Syvo-mac-arm64.zip', 'Syvo-mac-arm64.dmg', 'latest.yml', 'latest-mac.yml'].map(ativo) };
+  assert.strictEqual(interpretarRelease(r, 'win32', 'x64', '2.0.0').arquivo, 'Syvo-win-x64.exe');
+  assert.strictEqual(interpretarRelease(r, 'darwin', 'arm64', '2.0.0').arquivo, 'Syvo-mac-arm64.dmg');
+});

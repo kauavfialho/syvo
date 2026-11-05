@@ -4,27 +4,29 @@ App de computador para organizar o dinheiro do mês, o patrimônio e o imposto d
 
 A ideia é ajudar qualquer pessoa, da criança ao avô, a cuidar do próprio dinheiro de forma fácil e gratuita. O app foi gerado por inteligência artificial, a partir de uma ideia de Kauã Fialho.
 
-## Instalar
+## Baixar
 
-Baixe o instalador na página [Releases](https://github.com/kauavfialho/syvo-solution/releases):
+Clique no arquivo do seu computador e o download começa na hora. O link sempre traz a versão mais recente.
 
-| Sistema | Arquivo |
+### Instalador (recomendado)
+
+| Computador | Download |
 |---|---|
-| Mac com Apple Silicon (M1 ou mais novo) | `Syvo-x.x.x-mac-arm64.dmg` |
-| Mac com Intel | `Syvo-x.x.x-mac-x64.dmg` |
-| Windows | `Syvo-x.x.x-win-x64.exe` |
+| Windows 64 bits | [⬇️ Baixar para Windows (.exe)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-win-x64.exe) |
+| Mac com chip Apple (M1, M2, M3 ou mais novo) | [⬇️ Baixar para Mac Apple (.dmg)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-mac-arm64.dmg) |
+| Mac com processador Intel | [⬇️ Baixar para Mac Intel (.dmg)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-mac-x64.dmg) |
 
-Também há versões portáteis, que não precisam de instalação:
+### Portátil (usa sem instalar)
 
-| Sistema | Arquivo | Como usar |
-|---|---|---|
-| Windows | `Syvo-x.x.x-win-x64-portable.exe` | Coloque em uma pasta e abra. Os dados ficam na pasta `Syvo-dados`, ao lado do programa. |
-| Mac com Apple Silicon | `Syvo-x.x.x-mac-arm64.zip` | Descompacte e abra o app. |
-| Mac com Intel | `Syvo-x.x.x-mac-x64.zip` | Descompacte e abra o app. |
+| Computador | Download |
+|---|---|
+| Windows 64 bits | [⬇️ Baixar portátil para Windows (.exe)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-win-x64-portable.exe) |
+| Mac com chip Apple (M1, M2, M3 ou mais novo) | [⬇️ Baixar portátil para Mac Apple (.zip)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-mac-arm64.zip) |
+| Mac com processador Intel | [⬇️ Baixar portátil para Mac Intel (.zip)](https://github.com/kauavfialho/syvo-solution/releases/latest/download/Syvo-mac-x64.zip) |
 
-Na versão portátil de Windows, a atualização é manual: baixe o arquivo novo e coloque no lugar do antigo, mantendo a pasta `Syvo-dados`. No Mac, os dados ficam na pasta padrão do sistema.
+Não sabe qual é o seu Mac? Clique na maçã, no canto da tela, e depois em **Sobre Este Mac**. No Windows, os arquivos são para sistemas de 64 bits, que é o padrão dos computadores atuais. Não há versão para Windows 32 bits.
 
-Prefere ter todos os aplicativos em um lugar só? Use o [Vital Solutions](https://github.com/kauavfialho/vital-solutions), que instala, abre e atualiza o Syvo.
+Veja [todas as versões](https://github.com/kauavfialho/syvo-solution/releases).
 
 O app não tem certificado pago, então o sistema avisa na primeira vez.
 
