@@ -355,7 +355,7 @@ const ROTULO_IDIOMA = { pt: 'PT', en: 'EN', es: 'ES' };
 function idiomaAtual(){
   const salvo = localStorage.getItem(IDIOMA_STORAGE);
   if(salvo && TRADUCOES[salvo]) return salvo;
-  return 'pt';
+  return window.syvoIdioma || 'pt';
 }
 
 function t(chave){

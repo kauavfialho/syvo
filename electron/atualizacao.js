@@ -109,7 +109,7 @@ rm -rf "$4"
   spawn('/bin/sh', [script, String(process.pid), appAtual, novoApp, pastaTemp], { detached: true, stdio: 'ignore' }).unref();
 }
 
-function criarAtualizador({ janela, antesDeInstalar, sair }){
+function criarAtualizador({ janela, antesDeInstalar, sair, t = x => x }){
   // o teste automatico aponta pra um servidor local. em uso normal, sempre o github.
   const urlRelease = process.env.SYVO_URL_ATUALIZACAO || `https://api.github.com/repos/${REPOSITORIO}/releases/latest`;
   // a portatil nao tem instalacao para trocar: atualiza baixando o arquivo novo
@@ -134,7 +134,7 @@ function criarAtualizador({ janela, antesDeInstalar, sair }){
     if(nova && !jaAvisou){
       avisarTela('atualizacao:disponivel', { versao: nova.versao, notas: nova.notas });
       if(Notification.isSupported()){
-        const aviso = new Notification({ title: 'Atualização do Syvo', body: `A versão ${nova.versao} está disponível.` });
+        const aviso = new Notification({ title: t('Atualização do Syvo'), body: t('A versão {v} está disponível.').replace('{v}', nova.versao) });
         aviso.on('click', () => { const j = janela(); if(j){ j.show(); j.focus(); } });
         aviso.show();
       }

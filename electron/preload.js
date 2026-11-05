@@ -21,5 +21,6 @@ contextBridge.exposeInMainWorld('syvoNativo', {
   atualizacaoInstalar: () => ipcRenderer.invoke('atualizacao:instalar'),
   aoAtualizacaoDisponivel: fn => ipcRenderer.on('atualizacao:disponivel', (_e, d) => fn(d)),
   aoAtualizacaoProgresso: fn => ipcRenderer.on('atualizacao:progresso', (_e, d) => fn(d)),
+  definirIdioma: l => ipcRenderer.invoke('app:idioma', l),
   versao: () => ipcRenderer.invoke('app:versao')
 });

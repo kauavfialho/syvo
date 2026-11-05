@@ -8,6 +8,14 @@ const { DatabaseSync } = require('node:sqlite');
 const { abrirBanco, executar } = require('./banco');
 const { criarAtualizador } = require('./atualizacao');
 
+// janelas do sistema nao passam pela tela, entao tem o proprio dicionario
+let idioma = 'pt';
+const TEXTOS = {
+  en: { 'Escolha um backup do Syvo': 'Choose a Syvo backup', 'Backup do Syvo': 'Syvo backup', 'Cancelar': 'Cancel', 'Restaurar': 'Restore', 'Restaurar este backup?': 'Restore this backup?', 'Os dados atuais serão substituídos pelos do backup. Antes disso, uma cópia dos dados atuais é guardada na pasta de backups. O app vai reiniciar.': 'Your current data will be replaced by the backup. First, a copy of your current data is saved in the backups folder. The app will restart.', 'Exportar backup do Syvo': 'Export Syvo backup', 'Escolha o comprovante': 'Choose the receipt', 'PDF ou imagem': 'PDF or image', 'Atualização do Syvo': 'Syvo update', 'A versão {v} está disponível.': 'Version {v} is available.' },
+  es: { 'Escolha um backup do Syvo': 'Elige una copia de Syvo', 'Backup do Syvo': 'Copia de Syvo', 'Cancelar': 'Cancelar', 'Restaurar': 'Restaurar', 'Restaurar este backup?': '¿Restaurar esta copia?', 'Os dados atuais serão substituídos pelos do backup. Antes disso, uma cópia dos dados atuais é guardada na pasta de backups. O app vai reiniciar.': 'Los datos actuales se reemplazarán por los de la copia. Antes, una copia de los datos actuales se guarda en la carpeta de copias de seguridad. La app se reiniciará.', 'Exportar backup do Syvo': 'Exportar copia de Syvo', 'Escolha o comprovante': 'Elige el comprobante', 'PDF ou imagem': 'PDF o imagen', 'Atualização do Syvo': 'Actualización de Syvo', 'A versão {v} está disponível.': 'La versión {v} está disponible.' }
+};
+const t = texto => (TEXTOS[idioma] && TEXTOS[idioma][texto]) || texto;
+
 const PASTA_APP = path.join(__dirname, '..', 'app');
 const ORIGEM = 'app://syvo';
 const BACKUPS_GUARDADOS = 30;
@@ -106,6 +114,7 @@ function atender(canal, fn){
 function registrarPontes(){
   atender('banco:executar', d => executar(db, d));
   atender('app:versao', () => app.getVersion());
+  atender('app:idioma', l => { if(['pt', 'en', 'es'].includes(l)) idioma = l; });
   atender('atualizacao:estado', () => atualizador.estado());
   atender('atualizacao:verificar', () => atualizador.verificar());
   atender('atualizacao:instalar', () => atualizador.instalar());
@@ -118,9 +127,9 @@ function registrarPontes(){
   atender('backup:agora', () => { backupAgora(); return {}; });
   atender('backup:exportar', async () => {
     const r = await dialog.showSaveDialog(janela, {
-      title: 'Exportar backup do Syvo',
+      title: t('Exportar backup do Syvo'),
       defaultPath: `syvo-backup-${dia()}.db`,
-      filters: [{ name: 'Backup do Syvo', extensions: ['db'] }]
+      filters: [{ name: t('Backup do Syvo'), extensions: ['db'] }]
     });
     if(r.canceled || !r.filePath) return { cancelado: true };
     // vacuum into nao sobrescreve arquivo: gera num temporario e copia por cima do escolhido
@@ -135,14 +144,14 @@ function registrarPontes(){
   });
 
   atender('backup:restaurar', async () => {
-    const r = await dialog.showOpenDialog(janela, { title: 'Escolha um backup do Syvo', properties: ['openFile'], filters: [{ name: 'Backup do Syvo', extensions: ['db'] }] });
+    const r = await dialog.showOpenDialog(janela, { title: t('Escolha um backup do Syvo'), properties: ['openFile'], filters: [{ name: t('Backup do Syvo'), extensions: ['db'] }] });
     if(r.canceled || !r.filePaths[0]) return { cancelado: true };
     const origem = r.filePaths[0];
     if(!bancoValido(origem)) return { erro: 'Esse arquivo não é um backup válido do Syvo.' };
     const { response } = await dialog.showMessageBox(janela, {
-      type: 'warning', buttons: ['Cancelar', 'Restaurar'], defaultId: 0, cancelId: 0,
-      message: 'Restaurar este backup?',
-      detail: 'Os dados atuais serão substituídos pelos do backup. Antes disso, uma cópia dos dados atuais é guardada na pasta de backups. O app vai reiniciar.'
+      type: 'warning', buttons: [t('Cancelar'), t('Restaurar')], defaultId: 0, cancelId: 0,
+      message: t('Restaurar este backup?'),
+      detail: t('Os dados atuais serão substituídos pelos do backup. Antes disso, uma cópia dos dados atuais é guardada na pasta de backups. O app vai reiniciar.')
     });
     if(response !== 1) return { cancelado: true };
     backupAgora();
@@ -163,7 +172,7 @@ function registrarPontes(){
 
   atender('ir:anexar', async itemId => {
     if(!db.prepare('select 1 from ir_itens where id = ?').get(String(itemId))) return { erro: 'Item não encontrado.' };
-    const r = await dialog.showOpenDialog(janela, { title: 'Escolha o comprovante', properties: ['openFile'], filters: [{ name: 'PDF ou imagem', extensions: ANEXO_EXTENSOES }] });
+    const r = await dialog.showOpenDialog(janela, { title: t('Escolha o comprovante'), properties: ['openFile'], filters: [{ name: t('PDF ou imagem'), extensions: ANEXO_EXTENSOES }] });
     if(r.canceled || !r.filePaths[0]) return { cancelado: true };
     const origem = r.filePaths[0];
     const ext = path.extname(origem).slice(1).toLowerCase();
@@ -194,7 +203,7 @@ function registrarPontes(){
     if(janela) janela.webContents.focus();
   });
   ipcMain.on('dialogo:confirmar', (evento, msg) => {
-    const r = daTela(evento) ? dialog.showMessageBoxSync(janela, { type: 'question', buttons: ['Cancelar', 'OK'], defaultId: 1, cancelId: 0, message: 'Syvo', detail: msg }) : 0;
+    const r = daTela(evento) ? dialog.showMessageBoxSync(janela, { type: 'question', buttons: [t('Cancelar'), 'OK'], defaultId: 1, cancelId: 0, message: 'Syvo', detail: msg }) : 0;
     evento.returnValue = r === 1;
     if(janela) janela.webContents.focus();
   });
@@ -248,7 +257,7 @@ if(!app.requestSingleInstanceLock()){
     try { backupDoDia(); } catch(e){ console.warn('backup do dia falhou', e); }
     session.defaultSession.setPermissionRequestHandler((_wc, permissao, responder) => responder(permissao === 'notifications'));
     // copia de seguranca antes de instalar versao nova: o banco pode migrar na abertura seguinte
-    atualizador = criarAtualizador({ janela: () => janela, antesDeInstalar: () => backupAgora(), sair: () => app.quit() });
+    atualizador = criarAtualizador({ janela: () => janela, antesDeInstalar: () => backupAgora(), sair: () => app.quit(), t });
     registrarProtocolo();
     registrarPontes();
     criarJanela();

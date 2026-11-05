@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7c948"/>
+      <stop offset="1" stop-color="#ee8f2e"/>
+    </linearGradient>
+    <mask id="corte" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+      <rect width="1024" height="1024" fill="#fff"/>
+      <path d="M678.4 100L345.6 924" stroke="#000" stroke-width="44"/>
+    </mask>
+  </defs>
+  <rect x="48" y="48" width="928" height="928" rx="208" fill="url(#fundo)"/>
+  <g mask="url(#corte)">
+    <path d="M676 394c-30-40-88-64-164-64-96 0-166 42-166 108 0 144 332 78 332 192 0 62-72 104-166 104-80 0-140-28-174-74" fill="none" stroke="#1c2b24" stroke-width="120" stroke-linecap="round"/>
+  </g>
+</svg>

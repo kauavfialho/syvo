@@ -21,7 +21,7 @@
     const alvo = semAcento(busca.trim());
     const lista = DICAS.filter(d =>
       (categoria === 'todas' || (categoria === 'feitas' ? feitas.has(d.id) : d.categoria === categoria)) &&
-      (!alvo || semAcento(d.titulo + ' ' + d.texto).includes(alvo)));
+      (!alvo || semAcento(tr(d.titulo) + ' ' + tr(d.texto)).includes(alvo)));
     document.getElementById('aprProgresso').textContent = `Você já faz ${feitas.size} de ${DICAS.length} dicas`;
     document.getElementById('aprBarra').style.width = `${feitas.size}%`;
     document.getElementById('aprContagem').textContent = lista.length === 1 ? '1 dica' : `${lista.length} dicas`;
@@ -34,7 +34,7 @@
       <article class="dica ${feitas.has(d.id) ? 'feita' : ''}">
         <div class="dica-numero" aria-hidden="true">${CATEGORIAS[d.categoria].icone}</div>
         <div class="dica-corpo">
-          <h3>${d.id}. ${escapeHTML(d.titulo)}</h3>
+          <h3>${d.id}. ${escapeHTML(tr(d.titulo))}</h3>
           <p>${escapeHTML(d.texto)}</p>
           <label class="dica-feita"><input type="checkbox" data-dica="${d.id}" ${feitas.has(d.id) ? 'checked' : ''}> Já faço isso</label>
         </div>
@@ -69,7 +69,7 @@
       </div>
       <nav class="apr-categorias" aria-label="Categorias de dicas">
         <button type="button" data-apr-cat="todas">Todas</button>
-        ${Object.entries(CATEGORIAS).map(([k, c]) => `<button type="button" data-apr-cat="${k}">${c.icone} ${c.nome}</button>`).join('')}
+        ${Object.entries(CATEGORIAS).map(([k, c]) => `<button type="button" data-apr-cat="${k}">${c.icone} ${tr(c.nome)}</button>`).join('')}
         <button type="button" data-apr-cat="feitas">✅ Já faço</button>
       </nav>
       <p class="apr-contagem" id="aprContagem" aria-live="polite"></p>

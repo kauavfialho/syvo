@@ -2,7 +2,7 @@
 (function(){
   const G = window.syvoInvestimentos;
   const lista = itens => `<ul>${itens.map(t => `<li>${escapeHTML(t)}</li>`).join('')}</ul>`;
-  const selo = chave => `<span class="inv-selo inv-${chave}">${G.RISCOS[chave].icone} ${G.RISCOS[chave].nome}</span>`;
+  const selo = chave => `<span class="inv-selo inv-${chave}">${G.RISCOS[chave].icone} ${tr(G.RISCOS[chave].nome)}</span>`;
   const linha = (rotulo, texto) => `<div class="inv-linha"><strong>${rotulo}</strong><p>${escapeHTML(texto)}</p></div>`;
 
   function cartaoInvestimento(i){
@@ -56,7 +56,7 @@
         <p class="inv-intro">Clique no nome para abrir a explicação.</p>
         <nav class="apr-categorias" aria-label="Filtrar por risco">
           <button type="button" data-inv-risco="todos" class="ativa" aria-pressed="true">Todos</button>
-          ${Object.entries(G.RISCOS).map(([k, r]) => `<button type="button" data-inv-risco="${k}" aria-pressed="false">${r.icone} ${r.nome}</button>`).join('')}
+          ${Object.entries(G.RISCOS).map(([k, r]) => `<button type="button" data-inv-risco="${k}" aria-pressed="false">${r.icone} ${tr(r.nome)}</button>`).join('')}
         </nav>
         <div class="inv-lista">${G.INVESTIMENTOS.map(cartaoInvestimento).join('')}</div>
       </section>
