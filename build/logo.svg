@@ -6,11 +6,11 @@
     </linearGradient>
     <mask id="corte" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
       <rect width="1024" height="1024" fill="#fff"/>
-      <path d="M678.4 100L345.6 924" stroke="#000" stroke-width="44"/>
+      <path d="M678 100L346 924" stroke="#000" stroke-width="40"/>
     </mask>
   </defs>
   <rect x="48" y="48" width="928" height="928" rx="208" fill="url(#fundo)"/>
   <g mask="url(#corte)">
-    <path d="M676 394c-30-40-88-64-164-64-96 0-166 42-166 108 0 144 332 78 332 192 0 62-72 104-166 104-80 0-140-28-174-74" fill="none" stroke="#1c2b24" stroke-width="120" stroke-linecap="round"/>
+    <path d="M700 366C664 312 596 292 512 292C412 292 338 340 338 412C338 484 430 500 512 512C594 524 686 540 686 612C686 684 612 732 512 732C428 732 360 712 324 658" fill="none" stroke="#1c2b24" stroke-width="136"/>
   </g>
 </svg>
