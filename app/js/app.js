@@ -4952,7 +4952,16 @@ async function abrirFechamento(mk){
       porCat[c] = (porCat[c] || 0) + valorNaBase(i);
     });
     fech.topCats = Object.entries(porCat).sort((a, b) => b[1] - a[1]).slice(0, 3);
-    fech.apagar = doMes.filter(i => (i.tipo === 'contas' && !i.pago) || (i.tipo === 'gastos' && i.dataPrevista && !i.pago));
+    // o que e pago no cartao entra na fatura dele: no fechamento aparece uma linha por fatura, nao conta por conta
+    const noCartao = i => !!i.cartaoId && (i.formaPagamento === 'credito' || i.formaPagamento === 'credito_parcelado') && cartoesCache.some(c => c.id === i.cartaoId);
+    fech.apagar = doMes.filter(i => !noCartao(i) && ((i.tipo === 'contas' && !i.pago) || (i.tipo === 'gastos' && i.dataPrevista && !i.pago)));
+    const { data: pagas } = await sb.from('faturas_pagas').select('cartao_id').eq('mes', mesParaData(mk));
+    const jaPagas = new Set((pagas || []).map(r => r.cartao_id));
+    fech.faturas = cartoesCache.map(c => {
+      const itens = doMes.filter(i => noCartao(i) && i.cartaoId === c.id && (i.tipo === 'contas' || i.tipo === 'gastos'));
+      return { id: 'fatura:' + c.id, cartaoId: c.id, desc: 'Fatura ' + c.nome, valor: Math.round(itens.reduce((s, i) => s + valorNaBase(i), 0) * 100) / 100, moeda: moedaAtual(), contas: itens.filter(i => i.tipo === 'contas' && !i.pago).map(i => i.id), dia: c.diaVencimento };
+    }).filter(f => f.valor > 0 && !jaPagas.has(f.cartaoId));
+    fech.apagar = fech.apagar.concat(fech.faturas);
     fech.areceber = receberTodos.filter(i => i.recebido !== true);
     renderFechamento();
   } catch(err){
@@ -5007,7 +5016,7 @@ function renderFechamento(){
   } else if(fech.passo === 1){
     corpo.innerHTML = `<h2>Você pagou tudo de ${nome}?</h2>` + (fech.apagar.length
       ? `<p class="fech-nota">Marque o que foi pago. O que não foi passa pra ${prox} com o aviso <strong>atrasada</strong>.</p>
-         <div class="fech-lista">${fech.apagar.map(i => itemHtml(i, 'Paguei', 'Não paguei', i.tipo === 'contas' ? (i.dia ? 'Vencia dia ' + i.dia : 'Conta') : 'Gasto com prazo')).join('')}</div>`
+         <div class="fech-lista">${fech.apagar.map(i => itemHtml(i, 'Paguei', 'Não paguei', i.cartaoId && String(i.id).startsWith('fatura:') ? (i.dia ? 'Fatura do cartão · vencia dia ' + i.dia : 'Fatura do cartão') : (i.tipo === 'contas' ? (i.dia ? 'Vencia dia ' + i.dia : 'Conta') : 'Gasto com prazo'))).join('')}</div>`
       : `<div class="fech-tudo-ok">✓ Nenhuma conta pendente em ${nome}.</div>`);
   } else if(fech.passo === 2){
     corpo.innerHTML = `<h2>Você recebeu o que esperava?</h2>` + (fech.areceber.length
@@ -5016,7 +5025,7 @@ function renderFechamento(){
       : `<div class="fech-tudo-ok">✓ Nada pendente pra receber.</div>`);
   } else {
     const pagos = fech.apagar.filter(i => fech.resp[i.id] === 'sim').length;
-    const adiados = fech.apagar.length - pagos;
+    const adiados = fech.apagar.filter(i => !String(i.id).startsWith('fatura:') && fech.resp[i.id] !== 'sim').length;
     const recebidos = fech.areceber.filter(i => fech.resp[i.id] === 'sim').length;
     const linhas = [];
     if(pagos) linhas.push(`<li><span>Marcadas como pagas</span><span>${pagos}</span></li>`);
@@ -5036,6 +5045,14 @@ async function concluirFechamento(){
   try {
     const ops = [];
     fech.apagar.forEach(i => {
+      if(String(i.id).startsWith('fatura:')){
+        // fatura paga: marca a fatura e as contas que vieram nela. nao paga: fica aberta, nada muda de mes
+        if(fech.resp[i.id] === 'sim'){
+          ops.push(sb.from('faturas_pagas').insert({ user_id: currentUser.id, cartao_id: i.cartaoId, mes: mesParaData(fech.mk) }));
+          i.contas.forEach(id => ops.push(tabLanc().update({ pago: true }).eq('id', id)));
+        }
+        return;
+      }
       if(fech.resp[i.id] === 'sim') ops.push(tabLanc().update({ pago: true }).eq('id', i.id));
       else ops.push(tabLanc().update({ mes: mesParaData(fech.proxMk), adiada_de: mesParaData(i.adiadaDe || fech.mk) }).eq('id', i.id));
     });

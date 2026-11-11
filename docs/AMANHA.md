@@ -6,7 +6,7 @@ A versão 2.5.0 já trouxe o visual bege, a doca, o "+ Novo", a busca ⌘K, o gu
 
 ## Prioridades
 
-### 1. Telas que faltam do protótipo
+### 1. ✅ Telas que faltam do protótipo (feito na v2.6.0)
 A doca precisa ficar com os 9 itens do protótipo: Início, Lançamentos, Cartões, Carteira, Plano do mês, Pessoas, Rateio, IR e Aprender. O Sobre vai para o Menu.
 
 1. **Início novo**, ligado aos dados reais:
@@ -29,7 +29,7 @@ A doca precisa ficar com os 9 itens do protótipo: Início, Lançamentos, Cartõ
 
 Testar cada tela com uma cópia do banco (`SYVO_PASTA_DADOS`), em pt/en/es, e instalar só no fim, com backup antes.
 
-### 2. Pendência anotada
+### 2. ✅ Pendência anotada (feito na v2.6.1)
 - **Fechamento do mês:** contas pagas no cartão viram uma linha "Fatura <cartão>" que grava em `faturas_pagas`. Está no CLAUDE.md.
 
 ### 3. Rust (Tauri 2)
