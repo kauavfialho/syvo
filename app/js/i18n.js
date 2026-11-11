@@ -146,7 +146,9 @@
           }
         });
       }
-      const alerta = window.alert, confirmar = window.confirm, pedir = window.pedirTexto;
+      const alerta = window.alert, confirmar = window.confirm, pedir = window.pedirTexto, confirmarSyvo = window.confirmar, avisarSyvo = window.avisar;
+      if(confirmarSyvo) window.confirmar = m => confirmarSyvo(trMensagem(m));
+      if(avisarSyvo) window.avisar = m => avisarSyvo(trMensagem(m));
       window.alert = m => alerta(trMensagem(m));
       window.confirm = m => confirmar(trMensagem(m));
       if(pedir) window.pedirTexto = (m, v) => pedir(trMensagem(m), v);

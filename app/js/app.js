@@ -2586,7 +2586,7 @@ async function excluirPerfil(id){
     if(!(n >= 1 && n <= outros.length)){ alert('Número inválido. Nada foi excluído.'); return; }
     destino = outros[n - 1];
   }
-  if(!confirm(`Excluir o perfil "${p.nome}"?\n\nOs lançamentos dele vão para "${destino.nome}". Nada é apagado.`)) return;
+  if(!await confirmar(`Excluir o perfil "${p.nome}"?\n\nOs lançamentos dele vão para "${destino.nome}". Nada é apagado.`)) return;
   const { error: eMove } = await tabLanc().update({ perfil_id: destino.id }).eq('perfil_id', id);
   if(eMove){ alert('Erro ao mover os lançamentos: ' + eMove.message + '\n\nO perfil não foi excluído.'); return; }
   const { error } = await perfisUsoCol().delete().eq('id', id);
@@ -2653,7 +2653,7 @@ function _wireContasCarteira(){
   const selTipo = document.getElementById('conta-tipo');
   if(selTipo) selTipo.addEventListener('change', atualizarVisibilidadeAcoesConta);
   const grid = document.getElementById('listaContasCarteira');
-  if(grid) grid.addEventListener('click', (e) => {
+  if(grid) grid.addEventListener('click', async (e) => {
     const btnConta = e.target.closest('[data-acao-conta]');
     if(btnConta){
       e.stopPropagation();
@@ -2674,7 +2674,7 @@ function _wireContasCarteira(){
       if(!item) return;
       if(btnAtivo.dataset.action === 'edit-ativo') abrirFormAtivo(item.tipo, id);
       else if(btnAtivo.dataset.action === 'del-ativo'){
-        if(confirm('Excluir este ativo? A ação não pode ser desfeita.')){
+        if(await confirmar('Excluir este ativo? A ação não pode ser desfeita.')){
           sb.from('ativos').delete().eq('id', id).then(({ error }) => { if(error){ alert('Erro: ' + error.message); return; } carregarAtivos(); });
         }
       }
@@ -2882,7 +2882,7 @@ async function salvarConta(e){
 async function excluirConta(id){
   const c = contasCarteiraCache.find(x => x.id === id);
   if(!c) return;
-  if(!confirm(`Excluir a conta "${c.nome}"? Os ativos dentro dela ficam sem conta (não são apagados).`)) return;
+  if(!await confirmar(`Excluir a conta "${c.nome}"? Os ativos dentro dela ficam sem conta (não são apagados).`)) return;
   const { error } = await contasCol().delete().eq('id', id);
   if(error){ alert('Erro ao excluir: ' + error.message); return; }
   carregarContasCarteira();
@@ -3293,7 +3293,7 @@ document.getElementById('formGastoRapido').addEventListener('submit', async e =>
     if(fonte){
       const saldo = Number(fonte.valor) || 0;
       if(valor > saldo){
-        if(!confirm(`O saldo dessa fonte (${formatBRL(saldo)}) é menor que o gasto (${formatBRL(valor)}). O saldo ficará negativo. Deseja continuar?`)){
+        if(!await confirmar(`O saldo dessa fonte (${formatBRL(saldo)}) é menor que o gasto (${formatBRL(valor)}). O saldo ficará negativo. Deseja continuar?`)){
           return;
         }
       }
@@ -3442,7 +3442,7 @@ document.getElementById('btnSubmitFormAtivo').addEventListener('click', () => {
 });
 
 const _elListaAtivos = document.getElementById('listaAtivos');
-if(_elListaAtivos) _elListaAtivos.addEventListener('click', e => {
+if(_elListaAtivos) _elListaAtivos.addEventListener('click', async e => {
   const btn = e.target.closest('button[data-action]');
   if(!btn) return;
   const action = btn.dataset.action;
@@ -3453,7 +3453,7 @@ if(_elListaAtivos) _elListaAtivos.addEventListener('click', e => {
   if(action === 'edit-ativo'){
     abrirFormAtivo(item.tipo, id);
   } else if(action === 'del-ativo'){
-    if(confirm('Excluir este ativo? A ação não pode ser desfeita.')){
+    if(await confirmar('Excluir este ativo? A ação não pode ser desfeita.')){
       sb.from('ativos').delete().eq('id', id).then(({ error }) => { if(error){ alert('Erro: ' + error.message); return; } carregarAtivos(); });
     }
   }
@@ -3708,7 +3708,7 @@ function renderGraficoCartoes(){
   }
 }
 
-document.addEventListener('click', e => {
+document.addEventListener('click', async e => {
   const btn = e.target.closest('[data-action]');
   if(!btn) return;
   const action = btn.dataset.action;
@@ -3719,27 +3719,27 @@ document.addEventListener('click', e => {
       || receberAtrasados.find(i => i.id === btn.dataset.id);
 
     if(item && item.grupoParcelamento){
-      if(confirm(`Este lançamento é a parcela ${item.parcelaAtual}/${item.parcelaTotal} de um parcelamento.\n\nOK = excluir TODAS as parcelas deste parcelamento\nCancelar = escolher excluir só esta`)){
+      if(await confirmar(`Este lançamento é a parcela ${item.parcelaAtual}/${item.parcelaTotal} de um parcelamento.\n\nOK = excluir TODAS as parcelas deste parcelamento\nCancelar = escolher excluir só esta`)){
         deleteGrupoParcelamento(item.grupoParcelamento);
-      } else if(confirm('Excluir apenas esta parcela?')){
+      } else if(await confirmar('Excluir apenas esta parcela?')){
         deleteEntry(btn.dataset.id);
       }
     } else if(item && item.grupoRecorrente){
       const oQue = item.tipo === 'contas' ? 'conta fixa' : 'renda fixa';
-      if(confirm(`Esta é uma ${oQue} recorrente.\n\nOK = excluir esta e todas as próximas\nCancelar = escolher excluir só a deste mês`)){
+      if(await confirmar(`Esta é uma ${oQue} recorrente.\n\nOK = excluir esta e todas as próximas\nCancelar = escolher excluir só a deste mês`)){
         deleteRecorrentesFuturas(item.grupoRecorrente, item.mes);
-      } else if(confirm('Excluir apenas a deste mês?')){
+      } else if(await confirmar('Excluir apenas a deste mês?')){
         deleteEntry(btn.dataset.id);
       }
     } else {
-      if(confirm('Excluir este lançamento?')) deleteEntry(btn.dataset.id);
+      if(await confirmar('Excluir este lançamento?')) deleteEntry(btn.dataset.id);
     }
   } else if(action === 'toggle'){
     toggleContaPaga(btn.dataset.id, btn.dataset.pago === 'true');
   } else if(action === 'toggle-recebido'){
     toggleRecebido(btn.dataset.id, btn.dataset.recebido === 'true');
   } else if(action === 'del-cartao'){
-    if(confirm('Excluir este cartão? Os lançamentos antigos continuam mostrando o nome dele.')){
+    if(await confirmar('Excluir este cartão? Os lançamentos antigos continuam mostrando o nome dele.')){
       sb.from('cartoes').delete().eq('id', btn.dataset.id).then(({ error }) => { if(error){ alert('Erro: ' + error.message); return; } carregarCartoes(); });
     }
   } else if(action === 'edit-cartao'){
@@ -3862,7 +3862,7 @@ document.getElementById('btnConfirmarAntecipar').addEventListener('click', async
 
 async function desfazerAntecipacao(grupo){
   const mkAtual = monthKey(viewedMonth);
-  if(!confirm('Desfazer a antecipação destas parcelas? Elas voltam para os seus meses originais.')) return;
+  if(!await confirmar('Desfazer a antecipação destas parcelas? Elas voltam para os seus meses originais.')) return;
   try {
     const { error } = await tabLanc().update({ antecipada_em: null })
       .eq('grupo_parcelamento', grupo).eq('antecipada_em', mesParaData(mkAtual));
@@ -4239,7 +4239,7 @@ async function salvarEdicaoInline(){
     const cartaoId = vRasc('cartaoId', item.cartaoId || '') || null;
     if(cartaoId){ dadosBase.cartaoId = cartaoId; dadosBase.cartaoNome = nomeCartao(cartaoId); }
 
-    if(!confirm(`Converter em parcelamento de ${vezes}x?\n\nO lançamento atual será substituído pelas parcelas (${faturaAtual}/${vezes} em diante).`)) return;
+    if(!await confirmar(`Converter em parcelamento de ${vezes}x?\n\nO lançamento atual será substituído pelas parcelas (${faturaAtual}/${vezes} em diante).`)) return;
 
     const inicio = mesDoItem(item);
     tabLanc().delete().eq('id', id)
@@ -4291,7 +4291,7 @@ async function salvarEdicaoInline(){
     const eraFixa = item.recorrente === true;
 
     if(!fixaAgora && eraFixa){
-      if(!confirm('Desativar a fixação desta conta? As ocorrências futuras serão removidas (a deste mês fica).')) return;
+      if(!await confirmar('Desativar a fixação desta conta? As ocorrências futuras serão removidas (a deste mês fica).')) return;
       dados.recorrente = false;
       updateEntry(id, dados)
         .then(() => deleteRecorrentesFuturas(item.grupoRecorrente, monthKey(addMonths(mesDoItem(item), 1))))
@@ -4302,7 +4302,7 @@ async function salvarEdicaoInline(){
 
     if(fixaAgora && !eraFixa){
       const ultimo = addMonths(viewedMonth, MAX_FUTURE_MONTHS);
-      if(!confirm(`Ativar a fixação desta conta?\n\nSerá lançada todo mês até ${MESES[ultimo.getMonth()]}/${ultimo.getFullYear()}.`)) return;
+      if(!await confirmar(`Ativar a fixação desta conta?\n\nSerá lançada todo mês até ${MESES[ultimo.getMonth()]}/${ultimo.getFullYear()}.`)) return;
       const grupo = uid();
       dados.recorrente = true;
       dados.grupoRecorrente = grupo;
@@ -5693,12 +5693,12 @@ function renderOpcoesCustom(){
   document.getElementById('listaOrigensCustom').innerHTML = fmt('origens', opcoesCustom.origens);
 }
 
-document.getElementById('modalConfig').addEventListener('click', e => {
+document.getElementById('modalConfig').addEventListener('click', async e => {
   const btn = e.target.closest('[data-remove-opcao]');
   if(!btn) return;
   const tipo = btn.dataset.removeOpcao, valor = btn.dataset.valor;
   const nomeTipo = tipo === 'categorias' ? 'categoria' : 'origem';
-  if(confirm(`Remover a ${nomeTipo} "${valor}"?\n\nOs lançamentos que já a usam não mudam; ela só some da lista de opções.`)){
+  if(await confirmar(`Remover a ${nomeTipo} "${valor}"?\n\nOs lançamentos que já a usam não mudam; ela só some da lista de opções.`)){
     removerOpcaoCustom(tipo, valor).then(renderOpcoesCustom);
   }
 });
@@ -5726,7 +5726,7 @@ document.getElementById('btnMigrarInvestimentos').addEventListener('click', asyn
 
   const cOrigem = contasCarteiraCache.find(c => c.id === origem);
   const cDestino = contasCarteiraCache.find(c => c.id === destino);
-  if(!confirm(`Mover ${invs.length} investimento(s) de "${cOrigem.nome}" para "${cDestino.nome}"?\n\nSó os investimentos vão. Dinheiro parado, caixinhas e imóveis ficam em "${cOrigem.nome}".`)) return;
+  if(!await confirmar(`Mover ${invs.length} investimento(s) de "${cOrigem.nome}" para "${cDestino.nome}"?\n\nSó os investimentos vão. Dinheiro parado, caixinhas e imóveis ficam em "${cOrigem.nome}".`)) return;
 
   try {
     const ids = invs.map(a => a.id);
@@ -6050,8 +6050,8 @@ document.getElementById('btnBkRestaurar').addEventListener('click', async () => 
 document.getElementById('btnBkMostrar').addEventListener('click', () => window.syvoNativo.mostrarBanco());
 
 document.getElementById('btnEncerrarConta').addEventListener('click', async () => {
-  if(!confirm('Apagar TODOS os dados deste computador e recomeçar do zero?\n\nUma cópia fica na pasta de backups.')) return;
-  if(!confirm('Última confirmação: apagar tudo?')) return;
+  if(!await confirmar('Apagar TODOS os dados deste computador e recomeçar do zero?\n\nUma cópia fica na pasta de backups.')) return;
+  if(!await confirmar('Última confirmação: apagar tudo?')) return;
   try { await window.syvoNativo.apagarTudo(); }
   catch(err){ document.getElementById('erroSeguranca').textContent = 'Não foi possível apagar: ' + (err.message || err); }
 });
@@ -6158,7 +6158,7 @@ async function importarCSV(texto){
 
   if(registros.length === 0){ status.style.color = 'var(--expense)'; status.textContent = 'Nenhum registro válido encontrado.'; return; }
 
-  if(!confirm(`Importar ${registros.length} registro(s)?\n\nOs dados do arquivo serão adicionados aos atuais. Cartões e ativos recebem novos identificadores, e os vínculos (lançamento → cartão) são reconstruídos automaticamente.`)) return;
+  if(!await confirmar(`Importar ${registros.length} registro(s)?\n\nOs dados do arquivo serão adicionados aos atuais. Cartões e ativos recebem novos identificadores, e os vínculos (lançamento → cartão) são reconstruídos automaticamente.`)) return;
 
   status.textContent = 'Importando...';
   let importados = 0, erros = 0;

@@ -187,7 +187,7 @@
     }));
     v.querySelectorAll('[data-recebi]').forEach(b => b.addEventListener('click', async () => {
       const p = pessoas[Number(b.dataset.recebi)];
-      if(!confirm(`Marcar os ${p.itens.length} itens de ${p.nome} (${formatBRL(p.total)}) como recebidos neste mês?`)) return;
+      if(!await confirmar(`Marcar os ${p.itens.length} itens de ${p.nome} (${formatBRL(p.total)}) como recebidos neste mês?`)) return;
       const mes = mesParaData(mkHoje());
       const r = await Promise.all(p.itens.map(i => tabLanc().update({ recebido: true, mes_recebido: mes }).eq('id', i.id)));
       if(r.some(x => x.error)){ alert('Não foi possível marcar tudo.'); return; }
@@ -226,7 +226,7 @@
       try { await navigator.clipboard.writeText(msg); mostrarToast('Mensagem copiada. É só colar no grupo.'); } catch(e){ alert(msg); }
     }));
     v.querySelectorAll('[data-apagar-r]').forEach(b => b.addEventListener('click', async () => {
-      if(!confirm('Excluir este rateio?')) return;
+      if(!await confirmar('Excluir este rateio?')) return;
       await sb.from('rateios').delete().eq('id', b.dataset.apagarR); abrirRateio();
     }));
   }

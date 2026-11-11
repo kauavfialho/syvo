@@ -231,13 +231,18 @@
 
   // regras na hora de lancar um gasto
   const form = document.getElementById('form-gastos');
+  let liberado = false;
   if(form) form.addEventListener('submit', e => {
+    if(liberado){ liberado = false; return; }
     if(!plano || carregadoDe !== (perfilAtivoId + '|' + mkAtual())) return;
     const forma = (document.getElementById('gastos-pagamento') || {}).value;
     let msg = null;
     if(forma === 'credito_parcelado' && plano.regras.semParcelar) msg = 'Seu plano deste mês diz "sem parcelar". Lançar essa compra parcelada mesmo assim?';
     else if((forma === 'credito' || forma === 'credito_parcelado') && plano.regras.debito) msg = 'Seu plano deste mês diz "débito primeiro". Esse gasto vai para a fatura do cartão. Lançar mesmo assim?';
-    if(msg && !confirm(msg)){ e.preventDefault(); e.stopImmediatePropagation(); }
+    if(!msg) return;
+    // o submit precisa ser barrado na hora; a pergunta vem depois e, se a pessoa confirmar, reenvia
+    e.preventDefault(); e.stopImmediatePropagation();
+    confirmar(msg).then(ok => { if(ok){ liberado = true; form.requestSubmit(); } });
   }, true);
 
   // carrega o plano em segundo plano pra os avisos de 80% funcionarem mesmo fora da tela

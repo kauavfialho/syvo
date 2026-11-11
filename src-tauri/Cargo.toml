@@ -1,6 +1,6 @@
 [package]
 name = "syvo"
-version = "2.6.1"
+version = "2.6.2"
 edition = "2021"
 description = "Syvo - controle financeiro pessoal com banco local"
 authors = ["Kauã Fialho"]

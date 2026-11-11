@@ -460,7 +460,7 @@
     if(ds.irEditar){ abrirFormulario(aba, itens.find(i => i.id === ds.irEditar)); return; }
     if(ds.irApagar){
       const i = itens.find(x => x.id === ds.irApagar);
-      if(!i || !confirm(`Excluir "${i.descricao}" e os comprovantes dele?`)) return;
+      if(!i || !await confirmar(`Excluir "${i.descricao}" e os comprovantes dele?`)) return;
       const { error } = await sb.from('ir_itens').delete().eq('id', i.id);
       if(error){ alert('Erro: ' + error.message); return; }
       await window.irAbrir();
@@ -478,7 +478,7 @@
       return;
     }
     if(ds.irTirar){
-      if(!confirm('Remover este comprovante?')) return;
+      if(!await confirmar('Remover este comprovante?')) return;
       await window.syvoNativo.irRemoverAnexo(ds.irTirar);
       await window.irAbrir();
     }

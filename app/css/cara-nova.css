@@ -243,3 +243,10 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 /* doca com 9 itens cabe na tela */
 .view-nav.doca .view-btn{ width:48px; height:48px; }
 .view-nav.doca .view-nav-indicator{ height:48px; }
+
+/* janela de aviso e confirmacao do syvo */
+.janela-syvo{ background:rgba(27,33,26,0.35) !important; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); animation:jsFundo .2s ease; }
+.janela-syvo .modal{ border-radius:22px !important; background:rgba(255,253,246,0.92) !important; backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); border:1px solid rgba(255,255,255,0.85) !important; box-shadow:0 24px 60px rgba(0,0,0,0.22) !important; animation:jsCaixa .35s cubic-bezier(.2,.9,.25,1.25); }
+.janela-syvo .modal p{ font-size:0.95rem !important; color:var(--ink) !important; line-height:1.55 !important; }
+@keyframes jsFundo{ from{ opacity:0; } }
+@keyframes jsCaixa{ from{ opacity:0; transform:translateY(10px) scale(.96); } }

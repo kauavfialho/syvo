@@ -59,10 +59,55 @@
   }
   window.criarBancoLocal = () => ({ from: tabela => new Consulta(tabela) });
 
-  // alert/confirm do navegador travam o foco dos campos no windows. esses sao os do sistema.
-  window.alert = msg => window.syvoNativo.alerta(String(msg));
+  // avisos e confirmacoes sao janelas do proprio syvo, assincronas: funcionam igual no electron e no tauri
+  // (no webkit do tauri o confirm() do navegador devolve "nao" sem mostrar nada).
+  window.alert = msg => { window.avisar(String(msg)); };
   window.confirm = msg => window.syvoNativo.confirmar(String(msg));
 })();
+
+function janelaSyvo(mensagem, comCancelar, rotuloOk){
+  return new Promise(resolve => {
+    const fundo = document.createElement('div');
+    fundo.className = 'modal-overlay janela-syvo';
+    fundo.style.zIndex = '300';
+    const caixa = document.createElement('div');
+    caixa.className = 'modal';
+    caixa.setAttribute('role', comCancelar ? 'alertdialog' : 'dialog');
+    caixa.style.maxWidth = '440px';
+    const texto = document.createElement('p');
+    texto.style.whiteSpace = 'pre-line';
+    texto.textContent = mensagem;
+    const acoes = document.createElement('div');
+    acoes.className = 'modal-actions';
+    const ok = document.createElement('button');
+    ok.type = 'button'; ok.className = 'btn-primary'; ok.textContent = rotuloOk || 'OK';
+    let cancelar = null;
+    if(comCancelar){
+      cancelar = document.createElement('button');
+      cancelar.type = 'button'; cancelar.className = 'btn-secondary'; cancelar.textContent = 'Cancelar';
+      acoes.append(cancelar);
+    }
+    acoes.append(ok);
+    caixa.append(texto, acoes);
+    fundo.append(caixa);
+    document.body.append(fundo);
+    const antes = document.activeElement;
+    const fechar = valor => { document.removeEventListener('keydown', teclas, true); fundo.remove(); if(antes && antes.focus) try { antes.focus(); } catch(e){} resolve(valor); };
+    const teclas = e => {
+      if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); fechar(false); }
+      else if(e.key === 'Enter'){ e.preventDefault(); e.stopPropagation(); fechar(document.activeElement === cancelar ? false : true); }
+    };
+    document.addEventListener('keydown', teclas, true);
+    ok.addEventListener('click', () => fechar(true));
+    if(cancelar) cancelar.addEventListener('click', () => fechar(false));
+    fundo.addEventListener('click', e => { if(e.target === fundo) fechar(comCancelar ? false : true); });
+    ok.focus();
+  });
+}
+// confirmar: devolve true (OK) ou false (Cancelar). use com await.
+window.confirmar = mensagem => janelaSyvo(String(mensagem), true);
+// avisar: so mostra a mensagem; da pra esperar o OK com await se precisar
+window.avisar = mensagem => janelaSyvo(String(mensagem), false).then(() => undefined);
 
 // o electron nao tem prompt(), entao fiz um modal que devolve o texto (ou null se cancelar)
 window.pedirTexto = function(mensagem, valorInicial){
