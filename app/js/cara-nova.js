@@ -13,6 +13,9 @@
       const nome = b.textContent.replace(icone ? icone.textContent : '', '').trim();
       b.setAttribute('aria-label', nome);
       b.dataset.nome = nome;
+      // o nome sai do botao e vira um span escondido (o balao usa o data-nome). antes era font-size:0,
+      // e o webkit as vezes sumia com o icone junto
+      [...b.childNodes].forEach(n => { if(n.nodeType === 3 && n.textContent.trim()){ const sp = document.createElement('span'); sp.className = 'nav-rotulo'; sp.textContent = n.textContent.trim(); n.replaceWith(sp); } });
     });
     const ativo = nav.querySelector('.view-btn.active');
     if(ativo && typeof moverIndicadorNav === 'function') setTimeout(() => moverIndicadorNav(ativo), 50);
@@ -47,6 +50,19 @@
     }));
     guiaBtn.addEventListener('click', () => iniciarTour());
   }
+
+  // importar e buscar: icone e nome separados, para a tela estreita mostrar so o icone
+  ['#btnImportarExtrato', '#btnAbrirBusca'].forEach(sel => {
+    const b = $(sel); if(!b) return;
+    [...b.childNodes].forEach(n => {
+      if(n.nodeType !== 3 || !n.textContent.trim()) return;
+      const m = /^(\s*\S+\s+)(.+)$/.exec(n.textContent);
+      if(!m) return;
+      const ic = document.createElement('span'); ic.className = 'bt-icone'; ic.textContent = m[1].trim();
+      const ro = document.createElement('span'); ro.className = 'bt-rotulo'; ro.textContent = ' ' + m[2].trim();
+      n.replaceWith(ic, ro);
+    });
+  });
 
   // ---- busca no ⌘K / Ctrl+K de qualquer tela ----
   addEventListener('keydown', e => {

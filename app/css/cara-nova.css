@@ -255,3 +255,48 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 .tl-pilha .tl-fat{ right:16px !important; bottom:14px !important; text-align:right; line-height:1.15; }
 .tl-pilha .tl-fat small{ display:block; font-family:'IBM Plex Sans',sans-serif; font-weight:400; font-size:0.72rem; opacity:.85; }
 .tl-pilha .cartao-visual.claro + .tl-fat, .tl-pilha .cartao-visual[class*="cv-acab-gold"] + .tl-fat, .tl-pilha .cartao-visual[class*="cv-acab-platinum"] + .tl-fat, .tl-pilha .cartao-visual[class*="cv-acab-rose"] + .tl-fat, .tl-pilha .cartao-visual[class*="cv-acab-cobre"] + .tl-fat{ color:#2b2410; text-shadow:none; }
+
+/* ---- telas de todos os tamanhos ---- */
+.view-nav.doca .view-btn{ font-size:1rem !important; }
+.view-nav.doca .view-btn .nav-rotulo{ display:none; }
+.view-nav.doca .view-btn .nav-icone{ font-size:1.4rem; line-height:1; }
+.tl-degrau .t{ white-space:nowrap; font-size:0.74rem; }
+.tl-degrau .t b{ font-size:0.76rem; }
+.moeda-chip-wrap .busca-chip{ white-space:nowrap; }
+@media (max-width:1100px){
+  .tl-valor{ font-size:2.4rem; }
+  .tl-cascata{ gap:8px; }
+}
+@media (max-width:1000px){
+  /* topo: importar e buscar viram so o icone */
+  #btnImportarExtrato .bt-rotulo, #btnAbrirBusca .bt-rotulo{ display:none; }
+  #btnImportarExtrato, #btnAbrirBusca{ padding:8px 12px !important; }
+  #btnAbrirBusca kbd{ display:none; }
+  .home-topo{ gap:10px !important; }
+  .tl-grade2, .pl-grade{ grid-template-columns:1fr !important; }
+  .tl-pilha{ max-width:420px; margin:0 auto; }
+}
+@media (max-width:760px){
+  .view-nav.doca{ gap:2px; padding:6px; border-radius:20px; }
+  .view-nav.doca .view-btn{ width:40px !important; height:40px !important; border-radius:12px; }
+  .view-nav.doca .view-nav-indicator{ height:40px !important; top:6px !important; }
+  .view-nav.doca .view-btn .nav-icone{ font-size:1.15rem; }
+  .novo-btn{ padding:9px 14px; }
+  .tl-cascata{ height:120px; }
+  .tl-degrau .t{ font-size:0.68rem; }
+  .tl-pilha:hover .tl-cc:nth-child(1){ transform:translate(-110px,22px) rotate(-12deg); }
+  .tl-pilha:hover .tl-cc:nth-child(2){ transform:translate(-38px,6px) rotate(-4deg); }
+  .tl-pilha:hover .tl-cc:nth-child(3){ transform:translate(38px,6px) rotate(4deg); }
+  .tl-pilha:hover .tl-cc:nth-child(4){ transform:translate(110px,22px) rotate(12deg); }
+  .pl-regras{ grid-template-columns:1fr; }
+  .tl-p-cab{ grid-template-columns:48px 1fr; }
+  .tl-p-total{ grid-column:1 / -1; text-align:left; }
+}
+@media (max-width:520px){
+  .view-nav.doca .view-btn{ width:34px !important; height:34px !important; }
+  .view-nav.doca .view-nav-indicator{ height:34px !important; }
+  .view-nav.doca .view-btn .nav-icone{ font-size:1rem; }
+  .tl-valor, .pl-num{ font-size:2rem; }
+}
+/* na doca o icone e o botao inteiro: nunca some (o facil.css escondia em tela estreita e com letra grande) */
+.view-nav.doca .view-btn .nav-icone, html[data-letra] .view-nav.doca .view-btn .nav-icone{ display:inline-block !important; margin:0 !important; }

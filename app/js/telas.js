@@ -10,6 +10,8 @@
   const nomeMes = mk => MESES[Number(mk.split('-')[1]) - 1];
   const abrev = mk => MESES[Number(mk.split('-')[1]) - 1].slice(0, 3).toLowerCase();
   const esc = s => escapeHTML(String(s == null ? '' : s));
+  // valor curto para caber em tela estreita: 3.626, -1.018, 2,3 mil... (o valor inteiro aparece no mouse)
+  const curto = v => { const a = Math.abs(v), sinal = v < 0 ? '-' : ''; return sinal + (a >= 10000 ? (a / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil' : Math.round(a).toLocaleString('pt-BR')); };
 
   // dica no mouse, igual a do plano
   const dicaEl = document.createElement('div');
@@ -95,7 +97,7 @@
           <div class="tl-rot">Saldo de ${nomeMes(mk).toLowerCase()}</div>
           <div class="tl-valor" style="color:${saldo < 0 ? 'var(--expense)' : 'var(--income)'}">${formatBRL(saldo)}</div>
           ${aReceber > 0 ? `<div class="tl-frase">Ainda faltam <b>${formatBRL(aReceber)}</b> para entrar. Com isso, o mês fecha em <b>${formatBRL(comReceber)}</b>.</div>` : '<div class="tl-frase">&nbsp;</div>'}
-          <div class="tl-cascata">${passos.map(([n, v, de, ate, cor]) => `<div class="tl-degrau" data-n="${n}" data-v="${v}"><div class="b" style="bottom:${alt(Math.min(de, ate))}%;height:${Math.max(alt(Math.max(de, ate)) - alt(Math.min(de, ate)), 1.5)}%;background:linear-gradient(180deg,${cor}dd,${cor})"></div><div class="t">${n}<b>${(v > 0 && n !== 'Entrou' && n !== 'Saldo' ? '+' : '')}${formatBRL(v).replace('R$ ', '')}</b></div></div>`).join('')}</div>
+          <div class="tl-cascata">${passos.map(([n, v, de, ate, cor]) => `<div class="tl-degrau" data-n="${n}" data-v="${v}"><div class="b" style="bottom:${alt(Math.min(de, ate))}%;height:${Math.max(alt(Math.max(de, ate)) - alt(Math.min(de, ate)), 1.5)}%;background:linear-gradient(180deg,${cor}dd,${cor})"></div><div class="t">${n}<b>${(v > 0 && n !== 'Entrou' && n !== 'Saldo' ? '+' : '')}${curto(v)}</b></div></div>`).join('')}</div>
         </div>
         <div class="tl-painel">
           <div class="tl-topo"><h3>Cartões</h3><span class="tl-sub">passe o mouse</span></div>
