@@ -426,6 +426,10 @@ async function iniciarApp(){
   } catch(e){
     userCreatedAt = startOfMonth(new Date());
   }
+  try {
+    const { data: antigo } = await tabLanc().select('mes').order('mes').limit(1);
+    if(antigo && antigo[0]){ const d = mkParaDate(dataParaMes(antigo[0].mes)); if(d < userCreatedAt) userCreatedAt = d; }
+  } catch(e){}
   viewedMonth = startOfMonth(new Date());
   renderMonthLabel();
   await carregarPerfil();
@@ -544,7 +548,7 @@ const MAPA_CAMPOS_LANC = {
   grupoParcelamento: 'grupo_parcelamento', valorTotalCompra: 'valor_total_compra',
   antecipadaEm: 'antecipada_em', moeda: 'moeda', cotacao: 'cotacao',
   dataPrevista: 'data_prevista', notificadoVenc: 'notificado_venc',
-  perfilId: 'perfil_id', adiadaDe: 'adiada_de'
+  perfilId: 'perfil_id', adiadaDe: 'adiada_de', idExterno: 'id_externo'
 };
 const MAPA_CAMPOS_LANC_INV = Object.fromEntries(Object.entries(MAPA_CAMPOS_LANC).map(([k,v]) => [v,k]));
 
@@ -785,7 +789,8 @@ async function carregarCartoes(){
     const { data, error } = await sb.from('cartoes').select('*').order('nome');
     if(error) throw error;
     cartoesCache = (data || []).map(row => ({
-      id: row.id, tipo: row.tipo, nome: row.nome, limite: row.limite, cor: corSegura(row.cor)
+      id: row.id, tipo: row.tipo, nome: row.nome, limite: row.limite, cor: corSegura(row.cor), diaVencimento: row.dia_vencimento || null,
+      acabamento: ACABAMENTOS[row.acabamento] ? row.acabamento : null, foto: fotoSegura(row.foto)
     }));
   } catch(err){
     console.error('Erro ao ler cartões', err);
@@ -841,16 +846,20 @@ function renderListaCartoes(){
   }
   ul.innerHTML = cartoesCache.map(c => {
     const usoTotal = usoCartaoTotal(c.id);
-    let usoTxt = 'Uso: ' + formatBRL(usoTotal);
-    if(typeof c.limite === 'number' && c.limite > 0){
-      const pct = Math.round((usoTotal / c.limite) * 100);
-      usoTxt += ' / ' + formatBRL(c.limite) + ' (' + pct + '%)';
-    }
-    return `<li><div><div><span class="card-dot" style="background:${c.cor || COR_PADRAO_CARTAO};"></span>${escapeHTML(c.nome)}</div><div class="card-tipo">${escapeHTML(c.tipo)} · ${usoTxt}</div></div>
-     <div class="row-actions">
-       <button class="icon-btn" data-action="edit-cartao" data-id="${c.id}">✎ Editar</button>
-       <button class="icon-btn" data-action="del-cartao" data-id="${c.id}">✕ Excluir</button>
-     </div></li>`;
+    const cor = c.cor || COR_PADRAO_CARTAO;
+    const temLimite = typeof c.limite === 'number' && c.limite > 0;
+    const pct = temLimite ? Math.round((usoTotal / c.limite) * 100) : 0;
+    return `<li class="cv-item">
+      ${htmlCartaoVisual(c)}
+      <div class="cv-info">
+        <div class="cv-uso"><span>Uso: ${formatBRL(usoTotal)}</span><span>${temLimite ? 'Limite: ' + formatBRL(c.limite) : 'Sem limite cadastrado'}</span></div>
+        ${temLimite ? `<div class="cv-barra"><span style="width:${Math.min(pct, 100)}%;background:${pct >= 90 ? 'var(--expense)' : cor};"></span></div>` : ''}
+        <div class="row-actions">
+          <button class="icon-btn" data-action="edit-cartao" data-id="${c.id}">✎ Editar</button>
+          <button class="icon-btn" data-action="del-cartao" data-id="${c.id}">✕ Excluir</button>
+        </div>
+      </div>
+    </li>`;
   }).join('');
 }
 
@@ -1743,7 +1752,7 @@ function renderFaturas(){
           <span class="fc-name"><span class="pat-dot" style="background:${cor};"></span>${escapeHTML(c.nome)}${pagaSL ? '<span class="fc-tag-paga">paga</span>' : ''}</span>
           <span class="fc-valor">${formatBRL(usoMes)}</span>
         </div>
-        <div class="fc-meta"><span>Sem limite cadastrado</span><span>—</span></div>
+        <div class="fc-meta"><span>Sem limite cadastrado</span><span>${c.diaVencimento ? 'Vence dia ' + c.diaVencimento : '—'}</span></div>
         ${btnSL}
       </div>`;
     }
@@ -1787,7 +1796,7 @@ function renderFaturas(){
       ${legenda}
       <div class="fc-total">
         <span><span class="fct-pct" style="color:${corTotal};">${pctTotal}% do limite usado</span> · resta ${formatBRL(livre)}</span>
-        <span style="color:var(--ink-soft);">Limite: ${formatBRL(c.limite)}</span>
+        <span style="color:var(--ink-soft);">Limite: ${formatBRL(c.limite)}${c.diaVencimento ? ' · Vence dia ' + c.diaVencimento : ''}</span>
       </div>
       ${botaoPaga}
     </div>`;
@@ -1817,6 +1826,7 @@ function renderFaturas(){
 
   const btnAvancar = document.getElementById('btnAvancarMesFatura');
   if(btnAvancar) btnAvancar.addEventListener('click', () => mudarMes(1));
+  renderVencimentos();
 }
 
 let limitesChart = null;
@@ -2943,6 +2953,7 @@ async function carregarAlocacoes(){
   recalcularDisponivelAlocar();
 }
 
+let saldoMesCorrente = 0;
 async function recalcularDisponivelAlocar(){
   if(!currentUser) return;
   const mkAtual = monthKey(startOfMonth(new Date()));
@@ -2985,8 +2996,10 @@ async function recalcularDisponivelAlocar(){
     Object.keys(porMes).forEach(m => {
       const saldo = porMes[m].entradas - porMes[m].saidas;
       saldosPorMes[m] = saldo;
-      if(saldo > 0) totalSobra += saldo;
+      // o mes corrente ainda pode ter gasto e conta pela frente: a sobra so vale depois que ele acaba
+      if(saldo > 0 && m < mkAtual) totalSobra += saldo;
     });
+    saldoMesCorrente = porMes[mkAtual] ? porMes[mkAtual].entradas - porMes[mkAtual].saidas : 0;
     Object.keys(alocacoesCache).forEach(m => { totalJaAlocado += alocacoesCache[m]; });
 
     disponivelAlocar = Math.max(Math.round((totalSobra - totalJaAlocado) * 100) / 100, 0);
@@ -2998,6 +3011,14 @@ async function recalcularDisponivelAlocar(){
 
 function renderCardAlocar(totalSobra, totalJaAlocado){
   const card = document.getElementById('cardAlocar');
+  const aviso = document.getElementById('avisoSaldoCorrente');
+  if(aviso){
+    const prox = addMonths(startOfMonth(new Date()), 1);
+    aviso.textContent = saldoMesCorrente > 0
+      ? `O saldo de ${MESES[new Date().getMonth()].toLowerCase()} (${formatBRL(Math.round(saldoMesCorrente * 100) / 100)} até agora) entra aqui no dia 1º de ${MESES[prox.getMonth()].toLowerCase()}, quando o mês acabar.`
+      : '';
+    aviso.classList.toggle('hidden', !(saldoMesCorrente > 0));
+  }
   if(disponivelAlocar <= 0){
     card.classList.add('hidden');
     return;
@@ -4072,6 +4093,12 @@ function htmlEdicaoInline(tipo, item){
       </label>`;
     }
   }
+  // parcelado nao mostra a forma de pagamento, mas o cartao tem que dar pra trocar. vale pra todas as parcelas
+  if(ehContaOuGasto && ehParcelado){
+    campos += `<label>Cartão
+        <select data-ei="cartaoId">${optionsCartao(vRasc('cartaoId', item.cartaoId || ''))}</select>
+      </label>`;
+  }
 
   if(virandoParcelado){
     const vezes = parseInt(vRasc('vezes', 12), 10);
@@ -4298,6 +4325,20 @@ async function salvarEdicaoInline(){
     }
   }
 
+  if(ehContaOuGasto && ehParcelado){
+    const cartaoId = vRasc('cartaoId', item.cartaoId || '') || null;
+    if(cartaoId !== (item.cartaoId || null)){
+      const cartaoNome = cartaoId ? nomeCartao(cartaoId) : null;
+      dados.cartaoId = cartaoId;
+      dados.cartaoNome = cartaoNome;
+      tabLanc().update({ cartao_id: cartaoId, cartao_nome: cartaoNome }).eq('grupo_parcelamento', item.grupoParcelamento)
+        .then(({ error }) => { if(error) throw error; return updateEntry(id, dados); })
+        .then(cancelarEdicaoInline)
+        .catch(err => mostrarErroInline('Erro: ' + (err.message || err)));
+      return;
+    }
+  }
+
   updateEntry(id, dados).then(cancelarEdicaoInline).catch(() => {});
 }
 
@@ -4319,19 +4360,110 @@ const PALETA_CARTOES = [
 const COR_PADRAO_CARTAO = '#8A867B';
 let corSelecionada = COR_PADRAO_CARTAO;
 
+// acabamentos metalicos. a cor base vai pro grafico e pra bolinha, o desenho fica no css
+const ACABAMENTOS = {
+  black:    { nome: 'Black',      base: '#1d1d1f' },
+  gold:     { nome: 'Gold',       base: '#c9a227' },
+  platinum: { nome: 'Platinum',   base: '#9ea3a8' },
+  cobre:    { nome: 'Cobre',      base: '#b8733e' },
+  rose:     { nome: 'Rose gold',  base: '#c98b7f' }
+};
+let acabamentoSelecionado = null;
+let fotoSelecionada = null;
+function fotoSegura(f){ return (typeof f === 'string' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(f)) ? f : null; }
+
 function renderSwatches(){
   const wrap = document.getElementById('swatchesCartao');
+  const naPaleta = PALETA_CARTOES.some(c => c.hex.toLowerCase() === String(corSelecionada).toLowerCase());
+  const livre = !acabamentoSelecionado && !naPaleta;
   wrap.innerHTML = PALETA_CARTOES.map(c =>
-    `<button type="button" class="swatch${c.hex === corSelecionada ? ' selected' : ''}" style="background:${c.hex};" title="${c.nome}" data-cor="${c.hex}"></button>`
-  ).join('');
+    `<button type="button" class="swatch${!acabamentoSelecionado && c.hex === corSelecionada ? ' selected' : ''}" style="background:${c.hex};" title="${c.nome}" data-cor="${c.hex}"></button>`
+  ).join('') + `<label class="swatch swatch-livre${livre ? ' selected' : ''}" title="Outra cor" style="${livre ? 'background:' + corSelecionada : ''}">
+      <input type="color" id="corLivreCartao" value="${livre ? corSelecionada : '#5b8def'}" aria-label="Outra cor"><span aria-hidden="true">${livre ? '' : '+'}</span></label>`;
+  document.getElementById('acabamentosCartao').innerHTML = Object.entries(ACABAMENTOS).map(([k, a]) =>
+    `<button type="button" class="acab-opcao cv-acab-${k}${acabamentoSelecionado === k ? ' selected' : ''}" data-acab="${k}">${a.nome}</button>`).join('');
+  document.getElementById('btnTirarFotoCartao').classList.toggle('hidden', !fotoSelecionada);
+  renderPreviaCartao();
 }
 
+// html do desenho do cartao, usado na lista e na previa do formulario
+function htmlCartaoVisual(c){
+  const cor = c.cor || COR_PADRAO_CARTAO;
+  const final = (String(c.nome || '').match(/(\d{4})\s*$/) || [])[1];
+  const h = cor.replace('#', '');
+  const lum = (0.299 * parseInt(h.slice(0,2),16) + 0.587 * parseInt(h.slice(2,4),16) + 0.114 * parseInt(h.slice(4,6),16)) / 255;
+  const classes = ['cartao-visual'];
+  if(c.foto) classes.push('cv-com-foto');
+  else if(c.acabamento) classes.push('cv-acab-' + c.acabamento);
+  else if(lum > 0.62) classes.push('claro');
+  const estilo = c.foto ? `--cv-cor:${cor}; --cv-foto:url('${c.foto}');` : `--cv-cor:${cor};`;
+  return `<div class="${classes.join(' ')}" style="${estilo}">
+    <div class="cv-topo"><span class="cv-banco">${escapeHTML(c.tipo || '')}</span><span class="cv-sem-contato" aria-hidden="true">)))</span></div>
+    <div class="cv-chip" aria-hidden="true"></div>
+    <div class="cv-numero">${final ? '•••• ' + final : '•••• ••••'}</div>
+    <div class="cv-base">
+      <div><span class="cv-rotulo">Nome</span><strong class="cv-nome">${escapeHTML(c.nome || 'Seu cartão')}</strong></div>
+      <div class="cv-venc"><span class="cv-rotulo">Vence</span><strong>${c.diaVencimento ? 'Dia ' + c.diaVencimento : '—'}</strong></div>
+    </div>
+  </div>`;
+}
+
+function renderPreviaCartao(){
+  const prev = document.getElementById('previaCartao');
+  if(!prev) return;
+  const venc = parseInt(document.getElementById('cartao-vencimento').value, 10);
+  prev.outerHTML = htmlCartaoVisual({
+    tipo: document.getElementById('cartao-tipo').value, nome: document.getElementById('cartao-nome').value.trim(),
+    cor: acabamentoSelecionado ? ACABAMENTOS[acabamentoSelecionado].base : corSelecionada,
+    acabamento: acabamentoSelecionado, foto: fotoSelecionada, diaVencimento: venc >= 1 && venc <= 31 ? venc : null
+  }).replace('<div class="cartao-visual', '<div id="previaCartao" class="cv-previa cartao-visual');
+}
+['cartao-tipo', 'cartao-nome', 'cartao-vencimento'].forEach(id => document.getElementById(id).addEventListener('input', renderPreviaCartao));
+
 document.getElementById('swatchesCartao').addEventListener('click', e => {
-  const sw = e.target.closest('.swatch');
+  const sw = e.target.closest('button.swatch');
   if(!sw) return;
   corSelecionada = sw.dataset.cor;
+  acabamentoSelecionado = null;
   renderSwatches();
 });
+document.getElementById('swatchesCartao').addEventListener('input', e => {
+  if(e.target.id !== 'corLivreCartao') return;
+  corSelecionada = e.target.value;
+  acabamentoSelecionado = null;
+  renderSwatches();
+  // o seletor do sistema continua aberto: devolve o foco pro input novo
+  const novo = document.getElementById('corLivreCartao'); if(novo) novo.focus();
+});
+document.getElementById('acabamentosCartao').addEventListener('click', e => {
+  const b = e.target.closest('[data-acab]');
+  if(!b) return;
+  acabamentoSelecionado = b.dataset.acab;
+  corSelecionada = ACABAMENTOS[acabamentoSelecionado].base;
+  renderSwatches();
+});
+
+// foto: corta no formato do cartao e reduz, pra nao pesar no banco nem no backup
+document.getElementById('cartao-foto').addEventListener('change', e => {
+  const arq = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!arq) return;
+  const img = new Image();
+  const url = URL.createObjectURL(arq);
+  img.onload = () => {
+    const W = 640, H = 404;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const esc = Math.max(W / img.width, H / img.height);
+    const w = img.width * esc, h = img.height * esc;
+    cv.getContext('2d').drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+    fotoSelecionada = cv.toDataURL('image/jpeg', 0.82);
+    URL.revokeObjectURL(url);
+    renderSwatches();
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); document.getElementById('cartaoError').textContent = 'Não consegui abrir essa imagem. Tente uma foto JPG ou PNG.'; };
+  img.src = url;
+});
+document.getElementById('btnTirarFotoCartao').addEventListener('click', () => { fotoSelecionada = null; renderSwatches(); });
 
 function corCartao(id){
   const c = cartoesCache.find(x => x.id === id);
@@ -4369,8 +4501,11 @@ function resetFormCartao(){
   document.getElementById('cartao-nome').value = '';
   document.getElementById('cartao-limite').value = '';
   document.getElementById('cartaoError').textContent = '';
+  document.getElementById('cartao-vencimento').value = '';
   document.getElementById('btnSubmitCartao').textContent = '+ Adicionar cartão';
   corSelecionada = COR_PADRAO_CARTAO;
+  acabamentoSelecionado = null;
+  fotoSelecionada = null;
   renderSwatches();
 }
 
@@ -4381,7 +4516,10 @@ function abrirEdicaoCartao(id){
   document.getElementById('cartao-tipo').value = c.tipo;
   document.getElementById('cartao-nome').value = c.nome;
   document.getElementById('cartao-limite').value = (typeof c.limite === 'number') ? c.limite : '';
+  document.getElementById('cartao-vencimento').value = c.diaVencimento || '';
   corSelecionada = c.cor || COR_PADRAO_CARTAO;
+  acabamentoSelecionado = c.acabamento || null;
+  fotoSelecionada = c.foto || null;
   renderSwatches();
   document.getElementById('btnSubmitCartao').textContent = 'Salvar cartão';
   document.getElementById('cartaoError').textContent = '';
@@ -4404,9 +4542,15 @@ document.getElementById('formCartao').addEventListener('submit', e => {
     document.getElementById('cartaoError').textContent = 'Limite inválido.';
     return;
   }
+  const vencRaw = document.getElementById('cartao-vencimento').value;
+  const diaVencimento = vencRaw === '' ? null : parseInt(vencRaw, 10);
+  if(diaVencimento !== null && (isNaN(diaVencimento) || diaVencimento < 1 || diaVencimento > 31)){
+    document.getElementById('cartaoError').textContent = 'O vencimento é um dia entre 1 e 31.';
+    return;
+  }
   document.getElementById('cartaoError').textContent = '';
 
-  const dados = { tipo, nome, limite, cor: corSelecionada };
+  const dados = { tipo, nome, limite, cor: corSelecionada, dia_vencimento: diaVencimento, acabamento: acabamentoSelecionado, foto: fotoSelecionada };
   const op = cartaoEditandoId
     ? sb.from('cartoes').update(dados).eq('id', cartaoEditandoId)
     : sb.from('cartoes').insert(Object.assign({ user_id: currentUser.id }, dados));
@@ -4538,6 +4682,7 @@ function gastoContaNoMes(i){ return !(i.antecipadaEm && !i._antecipadaAqui); }
 function renderPaineisMes(){
   renderVencimentos();
   renderCategorias();
+  if(typeof renderRaioX === 'function') renderRaioX();
 }
 
 function renderVencimentos(){
@@ -4546,13 +4691,25 @@ function renderVencimentos(){
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const itens = [];
   const add = (i, data, sentido) => itens.push({ i, data, sentido });
+  const noCartao = i => !!i.cartaoId && (i.formaPagamento === 'credito' || i.formaPagamento === 'credito_parcelado') && cartoesCache.some(c => c.id === i.cartaoId);
   (entriesCache.contas || []).forEach(i => {
-    if(i.pago || !i.dia) return;
+    // conta no credito ja vem dentro da fatura do cartao, que aparece logo abaixo
+    if(i.pago || !i.dia || noCartao(i)) return;
     const [a, m] = mk.split('-').map(Number);
     const ultimo = new Date(a, m, 0).getDate();
     add(i, new Date(a, m - 1, Math.min(i.dia, ultimo)), 'pagar');
   });
-  (entriesCache.gastos || []).forEach(i => { if(i.dataPrevista && !i.pago && gastoContaNoMes(i)) add(i, new Date(i.dataPrevista + 'T00:00:00'), 'pagar'); });
+  (entriesCache.gastos || []).forEach(i => { if(i.dataPrevista && !i.pago && !noCartao(i) && gastoContaNoMes(i)) add(i, new Date(i.dataPrevista + 'T00:00:00'), 'pagar'); });
+  // uma linha por fatura de cartao com valor no mes e ainda nao paga
+  {
+    const [a, m] = mk.split('-').map(Number);
+    const ultimo = new Date(a, m, 0).getDate();
+    cartoesCache.forEach(c => {
+      const valor = Math.round(usoCartaoNoMes(c.id) * 100) / 100;
+      if(valor <= 0 || faturasPagasCache.has(c.id)) return;
+      add({ id: c.id, desc: 'Fatura ' + c.nome, valor, moeda: 'BRL', _fatura: true, _semDia: !c.diaVencimento }, new Date(a, m - 1, Math.min(c.diaVencimento || ultimo, ultimo)), 'fatura');
+    });
+  }
   [...(entriesCache.receber || []), ...(monthKey(viewedMonth) === monthKey(startOfMonth(new Date())) ? receberAtrasados : [])]
     .forEach(i => { if(i.recebido !== true && i.dataPrevista) add(i, new Date(i.dataPrevista + 'T00:00:00'), 'receber'); });
   if(!itens.length){ painel.classList.add('hidden'); return; }
@@ -4565,13 +4722,15 @@ function renderVencimentos(){
   itens.slice(0, limite).forEach(({ i, data, sentido }) => {
     const g = grupoDe(data);
     if(g !== ultimoGrupo){ html += `<div class="venc-grupo${g === 'Atrasado' ? ' atrasado' : ''}">${g}</div>`; ultimoGrupo = g; }
-    const acao = sentido === 'pagar'
+    const acao = sentido === 'fatura'
+      ? `<button class="icon-btn toggle" data-venc-fatura="${i.id}" title="Marcar fatura como paga">✓ Paguei</button>`
+      : sentido === 'pagar'
       ? `<button class="icon-btn toggle" data-action="toggle" data-id="${i.id}" data-pago="false" title="Marcar como pago">✓ Paguei</button>`
       : `<button class="icon-btn toggle" data-action="toggle-recebido" data-id="${i.id}" data-recebido="false" title="Marcar como recebido">✓ Recebi</button>`;
     html += `<div class="venc-item">
       <div class="venc-data"><strong>${String(data.getDate()).padStart(2,'0')}</strong><span>${DIAS_SEMANA[data.getDay()]}</span></div>
-      <div class="venc-txt"><strong>${escapeHTML(i.desc || 'Sem descrição')}</strong><span>${sentido === 'pagar' ? (i.tipo === 'contas' ? 'Conta a pagar' : 'Gasto a pagar') : 'A receber'}</span></div>
-      <span class="venc-valor ${sentido}">${formatMoeda(i.valor, i.moeda)}</span>
+      <div class="venc-txt"><strong>${escapeHTML(i.desc || 'Sem descrição')}</strong><span>${sentido === 'fatura' ? (i._semDia ? 'Fatura do cartão · sem dia de vencimento' : 'Fatura do cartão') : sentido === 'pagar' ? (i.tipo === 'contas' ? 'Conta a pagar' : 'Gasto a pagar') : 'A receber'}</span></div>
+      <span class="venc-valor ${sentido === 'fatura' ? 'pagar' : sentido}">${formatMoeda(i.valor, i.moeda)}</span>
       ${acao}
     </div>`;
   });
@@ -4581,6 +4740,10 @@ function renderVencimentos(){
   document.getElementById('vencMeta').textContent = atrasados ? `${atrasados} atrasado${atrasados > 1 ? 's' : ''}` : `${itens.length} pendente${itens.length > 1 ? 's' : ''}`;
   painel.classList.remove('hidden');
 }
+document.getElementById('vencLista').addEventListener('click', e => {
+  const b = e.target.closest('[data-venc-fatura]');
+  if(b) marcarFaturaPaga(b.dataset.vencFatura);
+});
 document.addEventListener('click', e => {
   if(e.target.id !== 'btnVencMais') return;
   _vencTodos = !_vencTodos;
@@ -4899,7 +5062,11 @@ document.getElementById('fechCorpo').addEventListener('click', e => {
   const b = e.target.closest('[data-fech-resp]');
   if(!b) return;
   fech.resp[b.dataset.fechId] = b.dataset.fechResp;
-  renderFechamento();
+  b.closest('.fech-escolha').querySelectorAll('[data-fech-resp]').forEach(x => {
+    x.classList.toggle('sel-sim', x.dataset.fechResp === 'sim' && x === b);
+    x.classList.toggle('sel-nao', x.dataset.fechResp === 'nao' && x === b);
+  });
+  document.getElementById('fechErro').textContent = '';
 });
 document.getElementById('btnFechVoltar').addEventListener('click', () => {
   if(fech.passo === 0){ document.getElementById('modalFechamento').classList.add('hidden'); return; }

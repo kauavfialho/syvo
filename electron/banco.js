@@ -13,7 +13,7 @@ const TABELAS = {
   perfis: { nome: 'txt', email: 'txt', telefone: 'txt', sexo: 'txt', nascimento: 'txt', foto_data: 'txt', foto_url: 'txt', categorias_custom: 'json', origens_custom: 'json' },
   perfis_uso: { tipo: 'txt', nome: 'txt', cor: 'txt', unidades: 'json' },
   contas_carteira: { tipo: 'txt', nome: 'txt', cor: 'txt', gerencia_acoes: 'bool' },
-  cartoes: { tipo: 'txt', nome: 'txt', limite: 'din', cor: 'txt' },
+  cartoes: { tipo: 'txt', nome: 'txt', limite: 'din', cor: 'txt', dia_vencimento: 'int', acabamento: 'txt', foto: 'txt' },
   ativos: { tipo: 'txt', nome: 'txt', valor: 'din', dados: 'json', conta_id: 'txt' },
   alocacoes: { mes: 'txt', valor_alocado: 'din' },
   faturas_pagas: { cartao_id: 'txt', mes: 'txt' },
@@ -25,12 +25,13 @@ const TABELAS = {
     grupo_recorrente: 'txt', forma_pagamento: 'txt', cartao_id: 'txt', cartao_nome: 'txt', categoria: 'txt',
     fonte_ativo_id: 'txt', origem: 'txt', recebido: 'bool', mes_recebido: 'txt', parcela_atual: 'int',
     parcela_total: 'int', grupo_parcelamento: 'txt', valor_total_compra: 'din', antecipada_em: 'txt', moeda: 'txt',
-    cotacao: 'real', data_prevista: 'txt', notificado_venc: 'txt', perfil_id: 'txt', adiada_de: 'txt'
+    cotacao: 'real', data_prevista: 'txt', notificado_venc: 'txt', perfil_id: 'txt', adiada_de: 'txt', id_externo: 'txt'
   },
   // imposto de renda: uma linha por item de cada ano-calendario. os campos de cada ficha vao no json.
   ir_itens: { ano: 'int', ficha: 'txt', descricao: 'txt', valor: 'din', dados: 'json', conferido: 'bool' },
   metas: { perfil_id: 'txt', tipo: 'txt', valor: 'din' },
-  dicas_feitas: { dica_id: 'int' }
+  dicas_feitas: { dica_id: 'int' },
+  regras_importacao: { chave: 'txt', tipo: 'txt', categoria: 'txt' }
 };
 for(const colunas of Object.values(TABELAS)){ colunas.id = 'txt'; colunas.criado_em = 'txt'; }
 
@@ -69,6 +70,17 @@ const MIGRACOES = [`
 `, `
   create table metas (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, tipo text not null check (tipo in ('mes', 'ano')), valor real not null check (valor > 0), unique (perfil_id, tipo));
   create table dicas_feitas (id text primary key, criado_em text not null, dica_id integer not null unique);
+`, `
+  -- importacao de extrato: identificador da linha do banco (para nao importar duas vezes) e o que o app aprendeu
+  alter table lancamentos add column id_externo text;
+  create index idx_lanc_id_externo on lancamentos(id_externo);
+  create table regras_importacao (id text primary key, criado_em text not null, chave text not null unique, tipo text not null, categoria text);
+`, `
+  -- dia em que a fatura do cartao vence, pra ela aparecer nos proximos vencimentos
+  alter table cartoes add column dia_vencimento integer check (dia_vencimento between 1 and 31);
+  -- visual do cartao: acabamento metalico (black, gold...) ou uma foto de fundo (jpeg em data url, ja reduzida)
+  alter table cartoes add column acabamento text;
+  alter table cartoes add column foto text;
 `];
 
 function abrirBanco(caminho){
