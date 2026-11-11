@@ -18,17 +18,17 @@ Click the file for your computer and the download starts right away. The link al
 
 | Computer | Download | Size |
 |---|---|---|
-| 64-bit Windows | [⬇️ Download for Windows (.exe)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-win-x64.exe) | 116 MB |
-| Mac with Apple chip (M1, M2, M3 or newer) | [⬇️ Download for Apple Mac (.dmg)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-arm64.dmg) | 115 MB |
-| Mac with Intel processor | [⬇️ Download for Intel Mac (.dmg)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-x64.dmg) | 121 MB |
+| 64-bit Windows | [⬇️ Download for Windows (.exe)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-win-x64.exe) | 3 MB |
+| Mac with Apple chip (M1, M2, M3 or newer) | [⬇️ Download for Apple Mac (.dmg)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-arm64.dmg) | 4 MB |
+| Mac with Intel processor | [⬇️ Download for Intel Mac (.dmg)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-x64.dmg) | 4.2 MB |
 
 ### Portable (no installation needed)
 
 | Computer | Download | Size |
 |---|---|---|
-| 64-bit Windows | [⬇️ Download portable for Windows (.exe)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-win-x64-portable.exe) | 106 MB |
-| Mac with Apple chip (M1, M2, M3 or newer) | [⬇️ Download portable for Apple Mac (.zip)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-arm64.zip) | 112 MB |
-| Mac with Intel processor | [⬇️ Download portable for Intel Mac (.zip)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-x64.zip) | 118 MB |
+| 64-bit Windows | [⬇️ Download portable for Windows (.exe)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-win-x64-portable.exe) | 8.6 MB |
+| Mac with Apple chip (M1, M2, M3 or newer) | [⬇️ Download portable for Apple Mac (.zip)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-arm64.zip) | 3.7 MB |
+| Mac with Intel processor | [⬇️ Download portable for Intel Mac (.zip)](https://github.com/kauavfialho/syvo/releases/latest/download/Syvo-mac-x64.zip) | 3.9 MB |
 
 Not sure which Mac you have? Click the Apple menu in the corner of the screen, then **About This Mac**. The Windows files are for 64-bit systems, the standard on current computers. There is no version for 32-bit Windows.
 
