@@ -21,6 +21,8 @@ const TABELAS = {
   orcamentos: { perfil_id: 'txt', categoria: 'txt', valor: 'din' },
   planos_mes: { perfil_id: 'txt', mes: 'txt', teto: 'din', regras: 'json' },
   orcamentos_mes: { perfil_id: 'txt', mes: 'txt', categoria: 'txt', valor: 'din' },
+  rateios: { nome: 'txt', total: 'din', data: 'txt', encerrado: 'bool' },
+  rateio_pessoas: { rateio_id: 'txt', nome: 'txt', valor: 'din', pago: 'bool' },
   patrimonio_historico: { mes: 'txt', total: 'din', liquido: 'din', investido: 'din', renda_passiva: 'din', atualizado_em: 'txt' },
   lancamentos: {
     tipo: 'txt', mes: 'txt', descricao: 'txt', valor: 'din', dia: 'int', pago: 'bool', recorrente: 'bool',
@@ -87,6 +89,11 @@ const MIGRACOES = [`
   -- plano do mes: teto de gasto, regras (debito primeiro, sem parcelar...) e quanto cada categoria pode gastar naquele mes
   create table planos_mes (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, teto real check (teto is null or teto > 0), regras text not null default '{}', unique (perfil_id, mes));
   create table orcamentos_mes (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, categoria text not null, valor real not null check (valor > 0), unique (perfil_id, mes, categoria));
+`, `
+  -- rateio: uma conta dividida entre varias pessoas (churrasco, viagem) e quem ja pagou
+  create table rateios (id text primary key, criado_em text not null, nome text not null, total real not null check (total > 0), data text, encerrado integer not null default 0);
+  create table rateio_pessoas (id text primary key, criado_em text not null, rateio_id text not null references rateios(id) on delete cascade, nome text not null, valor real not null default 0, pago integer not null default 0);
+  create index idx_rateio_pessoas on rateio_pessoas(rateio_id);
 `];
 
 function abrirBanco(caminho){

@@ -44,11 +44,14 @@
         <nav class="view-nav" id="viewNav">
           <span class="view-nav-indicator" id="viewNavIndicator"></span>
           <button class="view-btn active" data-view="mensal"><span class="nav-icone" aria-hidden="true">🏠</span>Início</button>
+          <button class="view-btn" data-view="lanc"><span class="nav-icone" aria-hidden="true">🧾</span>Lançamentos</button>
+          <button class="view-btn" data-view="cartoes"><span class="nav-icone" aria-hidden="true">💳</span>Cartões</button>
           <button class="view-btn" data-view="plano"><span class="nav-icone" aria-hidden="true">🎯</span>Plano do mês</button>
           <button class="view-btn" data-view="patrimonio"><span class="nav-icone" aria-hidden="true">💰</span>Minha carteira</button>
+          <button class="view-btn" data-view="pessoas"><span class="nav-icone" aria-hidden="true">👥</span>Pessoas</button>
+          <button class="view-btn" data-view="rateio"><span class="nav-icone" aria-hidden="true">🍖</span>Rateio</button>
           <button class="view-btn" data-view="ir"><span class="nav-icone" aria-hidden="true">📄</span>Imposto de renda</button>
           <button class="view-btn" data-view="aprender"><span class="nav-icone" aria-hidden="true">📚</span>Aprender</button>
-          <button class="view-btn" data-view="sobre"><span class="nav-icone" aria-hidden="true">ℹ️</span>Sobre</button>
         </nav>
 
         <div class="topbar-actions">
@@ -71,6 +74,7 @@
               <button class="wm-item" id="btnAbrirSeguranca">Dados e backup</button>
               <button class="wm-item" id="btnVerificarAtualizacao">Buscar atualização</button>
               <button class="wm-item" id="btnMostrarGuia" data-i18n="wm.guia">Primeiros passos</button>
+              <button class="wm-item" id="btnMenuSobre">Sobre o Syvo</button>
               <button class="wm-item" id="btnTema">Modo escuro</button>
               
             </div>
@@ -99,8 +103,8 @@
 
   <div class="body-region">
   <div class="sheet-content">
-  <div id="view-mensal">
-  <!-- topo da home: perfil, mes e moeda numa linha so -->
+  <div id="topoMes">
+  <!-- topo das telas do mes: perfil, mes, importar e buscar -->
   <div class="home-topo">
     <button type="button" class="perfil-chip" id="btnTrocarPerfil" title="Trocar perfil">
       <span class="perfil-chip-dot" id="perfilBarDot"></span>
@@ -123,6 +127,8 @@
   <div class="voltar-mes-atual-wrap">
     <button id="btnVoltarMesAtual" class="voltar-mes-atual hidden">↩ Voltar ao mês atual</button>
   </div>
+  </div>
+  <div id="view-mensal">
 
   <!-- fechamento: o mes novo so libera depois de fechar o anterior -->
   <section class="fechamento-aviso hidden" id="fechamentoAviso">
@@ -833,6 +839,10 @@
   <div id="view-aprender" class="hidden"></div>
 
   <div id="view-plano" class="hidden"></div>
+  <div id="view-lanc" class="hidden"></div>
+  <div id="view-cartoes" class="hidden"><section class="tl-painel" id="cartoesTopo"></section></div>
+  <div id="view-pessoas" class="hidden"></div>
+  <div id="view-rateio" class="hidden"></div>
 
   <div id="view-sobre" class="hidden">
     <section class="sobre-pagina">
@@ -1171,6 +1181,7 @@
 <script src="js/data-facil.js"></script>
 <script src="js/plano-calculo.js"></script>
 <script src="js/plano.js"></script>
+<script src="js/telas.js"></script>
 <script src="js/cara-nova.js"></script>
 </body>
 </html>

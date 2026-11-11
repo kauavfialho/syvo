@@ -502,12 +502,13 @@ function irParaView(view){
   document.querySelectorAll('.view-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.view === view);
   });
-  document.getElementById('view-mensal').classList.toggle('hidden', view !== 'mensal');
-  document.getElementById('view-patrimonio').classList.toggle('hidden', view !== 'patrimonio');
-  document.getElementById('view-ir').classList.toggle('hidden', view !== 'ir');
-  document.getElementById('view-sobre').classList.toggle('hidden', view !== 'sobre');
-  document.getElementById('view-aprender').classList.toggle('hidden', view !== 'aprender');
-  const vPlano = document.getElementById('view-plano'); if(vPlano) vPlano.classList.toggle('hidden', view !== 'plano');
+  ['mensal','patrimonio','ir','sobre','aprender','plano','lanc','cartoes','pessoas','rateio'].forEach(v => {
+    const el = document.getElementById('view-' + v); if(el) el.classList.toggle('hidden', view !== v);
+  });
+  // o topo com perfil, mes, importar e buscar vale para as telas do mes
+  const topoMes = document.getElementById('topoMes');
+  if(topoMes) topoMes.classList.toggle('hidden', !['mensal','plano','lanc','cartoes'].includes(view));
+  if(window.syvoTelas && typeof window.syvoTelas[view] === 'function') window.syvoTelas[view]();
   const ativo = document.querySelector(`.view-btn[data-view="${view}"]`);
   if(ativo) moverIndicadorNav(ativo);
   window.scrollTo({ top:0, behavior:'smooth' });
@@ -1014,7 +1015,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    document.querySelectorAll('#view-mensal .panel').forEach(p => p.classList.add('panel-hidden'));
+    document.querySelectorAll('.panel[id^="panel-"]').forEach(p => { if(p.id !== 'panel-cartoes') p.classList.add('panel-hidden'); });
     const alvo = document.getElementById('panel-' + btn.dataset.tab);
     if(alvo) alvo.classList.remove('panel-hidden');
     if(btn.dataset.tab === 'cartoes'){

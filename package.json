@@ -1,7 +1,7 @@
 {
   "name": "syvo",
   "productName": "Syvo",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "Syvo - controle financeiro pessoal com banco local",
   "main": "electron/main.js",
   "author": "Kauã Fialho",
