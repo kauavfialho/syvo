@@ -57,7 +57,11 @@ Testar cada tela com uma cópia do banco (`SYVO_PASTA_DADOS`), em pt/en/es, e in
    - São cerca de 50 lugares em `app.js`, `importar.js`, `ir.js`, `telas.js` e `plano.js`. Os handlers viram `async` e cada `if(!confirm(...))` vira `if(!await confirmar(...))`.
    - Isso funciona igual no Electron, então dá para fazer e testar antes da troca.
 3. ✅ Build release feito. Atenção: o release usa a pasta de dados **real** (`Syvo`). Só abrir com o ok do dono e com backup feito antes.
-4. Trocar o app instalado com backup antes. Depois, CI para Windows e Android.
+4. ✅ **Trocado em 11/11/2026:** o Syvo do Mac do dono agora é a versão em Rust (6,7 MB). As contagens antes e depois bateram: 308 lançamentos, 4 cartões, 10 a receber, soma R$ 80.814,82, integridade ok. O backup `antes-rust-*.db` está na pasta de backups e o Electron 2.6.2 está no Lixo.
+5. **Próximo passo importante:**
+   - O CI (`instaladores.yml`) ainda publica os instaladores do **Electron**. A versão em Rust só avisa de versão nova e abre a página, então a próxima release precisa publicar o **dmg do Tauri**. Também falta o Windows em Tauri (nsis/msi).
+   - Ligar o `tauri-plugin-updater` com chave de assinatura para atualizar sozinho.
+   - Depois, Android.
 
 ### Original
 
