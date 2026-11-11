@@ -99,7 +99,7 @@
         </div>
         <div class="tl-painel">
           <div class="tl-topo"><h3>Cartões</h3><span class="tl-sub">passe o mouse</span></div>
-          ${cartoes.length ? `<div class="tl-pilha">${cartoes.map(x => `<div class="tl-cc" style="--cor:${x.c.cor || '#8A867B'}" data-id="${x.c.id}">${htmlCartaoVisual(x.c)}<div class="tl-fat">${formatBRL(x.v)}</div></div>`).join('')}</div>
+          ${cartoes.length ? `<div class="tl-pilha">${cartoes.map(x => `<div class="tl-cc" style="--cor:${x.c.cor || '#8A867B'}" data-id="${x.c.id}">${htmlCartaoVisual(x.c)}<div class="tl-fat"><small>fatura</small>${formatBRL(x.v)}</div></div>`).join('')}</div>
           <div class="tl-uso">${cartoes.map(x => `<span style="width:${x.v / totalCart * 100}%;background:${x.c.cor || '#8A867B'}" title="${esc(x.c.nome)}"></span>`).join('')}</div>
           <div class="tl-leg">${cartoes.map(x => `<span><i style="background:${x.c.cor || '#8A867B'}"></i>${esc(x.c.nome)} ${Math.round(x.v / totalCart * 100)}%</span>`).join('')}</div>`
           : '<p class="tl-vazio">Cadastre seus cartões no Menu → Meus cartões.</p>'}

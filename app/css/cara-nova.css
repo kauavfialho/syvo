@@ -250,3 +250,8 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 .janela-syvo .modal p{ font-size:0.95rem !important; color:var(--ink) !important; line-height:1.55 !important; }
 @keyframes jsFundo{ from{ opacity:0; } }
 @keyframes jsCaixa{ from{ opacity:0; transform:translateY(10px) scale(.96); } }
+/* cartoes empilhados no inicio: o valor da fatura fica no lugar do "vence" (que continua na tela Cartoes) */
+.tl-pilha .cv-venc{ visibility:hidden; }
+.tl-pilha .tl-fat{ right:16px !important; bottom:14px !important; text-align:right; line-height:1.15; }
+.tl-pilha .tl-fat small{ display:block; font-family:'IBM Plex Sans',sans-serif; font-weight:400; font-size:0.72rem; opacity:.85; }
+.tl-pilha .cartao-visual.claro + .tl-fat, .tl-pilha .cartao-visual[class*="cv-acab-gold"] + .tl-fat, .tl-pilha .cartao-visual[class*="cv-acab-platinum"] + .tl-fat, .tl-pilha .cartao-visual[class*="cv-acab-rose"] + .tl-fat, .tl-pilha .cartao-visual[class*="cv-acab-cobre"] + .tl-fat{ color:#2b2410; text-shadow:none; }
