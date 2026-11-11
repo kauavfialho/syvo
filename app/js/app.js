@@ -791,7 +791,8 @@ async function carregarCartoes(){
   try {
     const { data, error } = await sb.from('cartoes').select('*').order('nome');
     if(error) throw error;
-    cartoesCache = (data || []).map(row => ({
+    // cada perfil ve so os cartoes dele (cartao sem dono aparece em todos)
+    cartoesCache = (data || []).filter(row => !row.perfil_id || !perfilAtivoId || row.perfil_id === perfilAtivoId).map(row => ({
       id: row.id, tipo: row.tipo, nome: row.nome, limite: row.limite, cor: corSegura(row.cor), diaVencimento: row.dia_vencimento || null,
       acabamento: ACABAMENTOS[row.acabamento] ? row.acabamento : null, foto: fotoSegura(row.foto)
     }));
@@ -2562,7 +2563,9 @@ async function salvarPerfil(){
   if(perfilEditandoId){
     ({ error } = await perfisUsoCol().update(payload).eq('id', perfilEditandoId));
   } else {
-    ({ error } = await perfisUsoCol().insert(payload));
+    let novo;
+    ({ data: novo, error } = await perfisUsoCol().insert(payload).select().single());
+    if(!error && novo && novo.id){ try { localStorage.setItem('syvo-tour-novo-' + novo.id, '1'); } catch(e){} }
   }
   if(error){ document.getElementById('perfilFormErro').textContent = 'Erro: ' + error.message; return; }
   document.getElementById('modalPerfilForm').classList.add('hidden');
@@ -2589,6 +2592,7 @@ async function excluirPerfil(id){
   if(!await confirmar(`Excluir o perfil "${p.nome}"?\n\nOs lançamentos dele vão para "${destino.nome}". Nada é apagado.`)) return;
   const { error: eMove } = await tabLanc().update({ perfil_id: destino.id }).eq('perfil_id', id);
   if(eMove){ alert('Erro ao mover os lançamentos: ' + eMove.message + '\n\nO perfil não foi excluído.'); return; }
+  await sb.from('cartoes').update({ perfil_id: destino.id }).eq('perfil_id', id);
   const { error } = await perfisUsoCol().delete().eq('id', id);
   if(error){ alert('Erro ao excluir: ' + error.message); return; }
   if(perfilAtivoId === id){ perfilAtivoId = destino.id; localStorage.setItem('syvo-perfil-ativo', destino.id); }
@@ -2605,6 +2609,10 @@ function entrarPerfil(id){
   document.getElementById('modalPerfis').classList.add('hidden');
   // b2: recarrega o fluxo pro perfil escolhido
   if(typeof recarregarAposEscrita === 'function') recarregarAposEscrita();
+  // cartoes e primeiros passos sao de cada perfil
+  carregarCartoes().then(() => agendarGuia());
+  // perfil novo ve o guia da tela na primeira vez que entra
+  try { if(localStorage.getItem('syvo-tour-novo-' + id)){ localStorage.removeItem('syvo-tour-novo-' + id); setTimeout(() => window.syvoIniciarTour && window.syvoIniciarTour(), 900); } } catch(e){}
 }
 
 function _wirePerfis(){
@@ -4556,7 +4564,7 @@ document.getElementById('formCartao').addEventListener('submit', e => {
   const dados = { tipo, nome, limite, cor: corSelecionada, dia_vencimento: diaVencimento, acabamento: acabamentoSelecionado, foto: fotoSelecionada };
   const op = cartaoEditandoId
     ? sb.from('cartoes').update(dados).eq('id', cartaoEditandoId)
-    : sb.from('cartoes').insert(Object.assign({ user_id: currentUser.id }, dados));
+    : sb.from('cartoes').insert(Object.assign({ user_id: currentUser.id, perfil_id: perfilAtivoId || null }, dados));
 
   op.then(({ error }) => {
       if(error) throw error;
@@ -5110,6 +5118,8 @@ document.getElementById('btnFechAvancar').addEventListener('click', () => {
 // guia de primeiros passos. cada passo se marca sozinho olhando os dados da pessoa (todos os perfis),
 // entao funciona igual em qualquer aparelho. so o "ocultar" fica no navegador.
 function abrirAbaComForm(tab){
+  // as abas moraram para a tela Lancamentos: abre ela antes, senao o formulario abre escondido
+  if(document.getElementById('view-lanc') && typeof irParaView === 'function') irParaView('lanc');
   const btnTab = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
   if(btnTab) btnTab.click();
   abrirFormEntrada('form-' + tab);
@@ -5131,7 +5141,7 @@ function agendarGuia(){
   clearTimeout(_guiaTimer);
   _guiaTimer = setTimeout(renderGuiaInicio, 400);
 }
-function guiaChaveOculto(){ return 'syvo-guia-oculto-' + (currentUser ? currentUser.id : ''); }
+function guiaChaveOculto(){ return 'syvo-guia-oculto-' + (currentUser ? currentUser.id : '') + (perfilAtivoId ? '-' + perfilAtivoId : ''); }
 
 async function renderGuiaInicio(){
   const box = document.getElementById('guiaInicio');
@@ -5143,8 +5153,8 @@ async function renderGuiaInicio(){
   // so conta, nao traz linha nenhuma
   const contar = async q => { try { const { count, error } = await q; return error ? 0 : (count || 0); } catch(e){ return 0; } };
   const [nRenda, nContas, nCarteira] = await Promise.all([
-    contar(tabLanc().select('id', { count:'exact', head:true }).eq('tipo', 'renda')),
-    contar(tabLanc().select('id', { count:'exact', head:true }).eq('tipo', 'contas')),
+    contar(tabLanc().select('id', { count:'exact', head:true }).eq('tipo', 'renda').eq('perfil_id', perfilAtivoId)),
+    contar(tabLanc().select('id', { count:'exact', head:true }).eq('tipo', 'contas').eq('perfil_id', perfilAtivoId)),
     contar(sb.from('contas_carteira').select('id', { count:'exact', head:true }))
   ]);
 

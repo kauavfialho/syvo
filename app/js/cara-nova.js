@@ -19,6 +19,43 @@
     });
     const ativo = nav.querySelector('.view-btn.active');
     if(ativo && typeof moverIndicadorNav === 'function') setTimeout(() => moverIndicadorNav(ativo), 50);
+
+    // tela estreita e celular: a doca vira barra de abas com nome embaixo do icone.
+    // so as 4 principais ficam na barra, o resto vai pro "mais" (uma gaveta que sobe de baixo)
+    const PRINCIPAIS = ['mensal', 'lanc', 'cartoes', 'plano'];
+    nav.querySelectorAll('.view-btn').forEach(b => { if(!PRINCIPAIS.includes(b.dataset.view)) b.classList.add('doca-extra'); });
+    // nome curto embaixo do icone, pra caber no celular
+    const CURTOS = { lanc: 'Lançamentos', plano: 'Plano' };
+    Object.entries(CURTOS).forEach(([v, t]) => { const b = nav.querySelector(`.view-btn[data-view="${v}"]`); if(b){ const c = document.createElement('span'); c.className = 'nav-curto'; c.textContent = t; b.appendChild(c); } });
+    const mais = document.createElement('button');
+    mais.type = 'button'; mais.className = 'doca-mais'; mais.setAttribute('aria-label', 'Mais');
+    mais.innerHTML = '<span class="nav-icone" aria-hidden="true">•••</span><span class="nav-rotulo">Mais</span>';
+    nav.appendChild(mais);
+    const gaveta = document.createElement('div');
+    gaveta.className = 'doca-gaveta'; gaveta.hidden = true;
+    gaveta.innerHTML = `<div class="dg-fundo"></div><div class="dg-caixa" role="menu"><div class="dg-alca"></div>${
+      [...nav.querySelectorAll('.view-btn.doca-extra')].map(b => `<button type="button" class="dg-item" data-ir="${b.dataset.view}"><span class="e">${b.querySelector('.nav-icone').textContent}</span><span>${b.dataset.nome}</span></button>`).join('')
+    }</div>`;
+    document.body.appendChild(gaveta);
+    const fecharGaveta = () => { gaveta.classList.remove('aberta'); setTimeout(() => { gaveta.hidden = true; }, 250); };
+    window.syvoFecharGaveta = () => { if(!gaveta.hidden) fecharGaveta(); };
+    mais.addEventListener('click', () => {
+      if(!gaveta.hidden){ fecharGaveta(); return; }
+      document.getElementById('waffleMenu')?.classList.add('hidden');
+      document.querySelector('.novo-wrap')?.classList.remove('aberto');
+      gaveta.querySelectorAll('.dg-item').forEach(i => i.classList.toggle('ativo', !!nav.querySelector(`.view-btn.active[data-view="${i.dataset.ir}"]`)));
+      gaveta.hidden = false; setTimeout(() => gaveta.classList.add('aberta'), 10);
+    });
+    gaveta.querySelector('.dg-fundo').addEventListener('click', fecharGaveta);
+    gaveta.querySelectorAll('.dg-item').forEach(i => i.addEventListener('click', () => {
+      const b = nav.querySelector(`.view-btn[data-view="${i.dataset.ir}"]`);
+      if(b) b.click();
+      fecharGaveta();
+    }));
+    // o "mais" fica marcado quando a tela aberta e uma das que estao dentro dele
+    const marcarMais = () => mais.classList.toggle('active', !!nav.querySelector('.view-btn.doca-extra.active'));
+    new MutationObserver(marcarMais).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
+    marcarMais();
   }
 
   // ---- "+ Novo" no topo, com menu ao passar o mouse ----
@@ -39,13 +76,17 @@
     guiaBtn.title = 'Ver o guia'; guiaBtn.setAttribute('aria-label', 'Ver o guia'); guiaBtn.textContent = '?';
     acoes.prepend(guiaBtn);
     acoes.prepend(wrap);
-    $('#btnNovo').addEventListener('click', e => { e.stopPropagation(); wrap.classList.toggle('aberto'); });
+    // so um menu aberto por vez: abrir o "+ novo" fecha o menu e o "mais", e vice-versa
+    const fecharMenu = () => { const m = document.getElementById('waffleMenu'); if(m) m.classList.add('hidden'); };
+    $('#btnNovo').addEventListener('click', e => { e.stopPropagation(); fecharMenu(); window.syvoFecharGaveta?.(); wrap.classList.toggle('aberto'); });
+    wrap.addEventListener('mouseenter', () => { if(matchMedia('(hover:hover)').matches) fecharMenu(); });
+    const bw = document.getElementById('btnWaffle');
+    if(bw) bw.addEventListener('click', () => { wrap.classList.remove('aberto'); window.syvoFecharGaveta?.(); });
     document.addEventListener('click', e => { if(!wrap.contains(e.target) && !document.getElementById('tourBolha')?.classList.contains('on') && !e.target.closest('.tour-bolha')) wrap.classList.remove('aberto'); });
     wrap.querySelectorAll('[data-novo]').forEach(b => b.addEventListener('click', () => {
       wrap.classList.remove('aberto');
       const t = b.dataset.novo;
-      if(typeof irParaView === 'function') irParaView('mensal');
-      if(t === 'importar'){ const imp = $('#btnImportarExtrato'); if(imp) imp.click(); return; }
+      if(t === 'importar'){ if(typeof irParaView === 'function') irParaView('mensal'); const imp = $('#btnImportarExtrato'); if(imp) imp.click(); return; }
       setTimeout(() => abrirAbaComForm(t), 80);
     }));
     guiaBtn.addEventListener('click', () => iniciarTour());

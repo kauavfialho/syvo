@@ -13,7 +13,7 @@ const TABELAS = {
   perfis: { nome: 'txt', email: 'txt', telefone: 'txt', sexo: 'txt', nascimento: 'txt', foto_data: 'txt', foto_url: 'txt', categorias_custom: 'json', origens_custom: 'json' },
   perfis_uso: { tipo: 'txt', nome: 'txt', cor: 'txt', unidades: 'json' },
   contas_carteira: { tipo: 'txt', nome: 'txt', cor: 'txt', gerencia_acoes: 'bool' },
-  cartoes: { tipo: 'txt', nome: 'txt', limite: 'din', cor: 'txt', dia_vencimento: 'int', acabamento: 'txt', foto: 'txt' },
+  cartoes: { tipo: 'txt', nome: 'txt', limite: 'din', cor: 'txt', dia_vencimento: 'int', acabamento: 'txt', foto: 'txt', perfil_id: 'txt' },
   ativos: { tipo: 'txt', nome: 'txt', valor: 'din', dados: 'json', conta_id: 'txt' },
   alocacoes: { mes: 'txt', valor_alocado: 'din' },
   faturas_pagas: { cartao_id: 'txt', mes: 'txt' },
@@ -94,6 +94,12 @@ const MIGRACOES = [`
   create table rateios (id text primary key, criado_em text not null, nome text not null, total real not null check (total > 0), data text, encerrado integer not null default 0);
   create table rateio_pessoas (id text primary key, criado_em text not null, rateio_id text not null references rateios(id) on delete cascade, nome text not null, valor real not null default 0, pago integer not null default 0);
   create index idx_rateio_pessoas on rateio_pessoas(rateio_id);
+`, `
+  -- cartao passa a ter dono: cada perfil ve so os seus. o cartao antigo vai pro perfil que mais usou ele,
+  -- e se ninguem usou, pro perfil mais antigo. perfil_id vazio = aparece em todos (nao deveria sobrar nenhum)
+  alter table cartoes add column perfil_id text;
+  update cartoes set perfil_id = (select l.perfil_id from lancamentos l where l.cartao_id = cartoes.id and l.perfil_id is not null group by l.perfil_id order by count(*) desc limit 1);
+  update cartoes set perfil_id = (select id from perfis_uso order by criado_em limit 1) where perfil_id is null;
 `];
 
 function abrirBanco(caminho){

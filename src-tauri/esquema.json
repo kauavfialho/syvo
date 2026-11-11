@@ -5,7 +5,8 @@
   "\n  -- importacao de extrato: identificador da linha do banco (para nao importar duas vezes) e o que o app aprendeu\n  alter table lancamentos add column id_externo text;\n  create index idx_lanc_id_externo on lancamentos(id_externo);\n  create table regras_importacao (id text primary key, criado_em text not null, chave text not null unique, tipo text not null, categoria text);\n",
   "\n  -- dia em que a fatura do cartao vence, pra ela aparecer nos proximos vencimentos\n  alter table cartoes add column dia_vencimento integer check (dia_vencimento between 1 and 31);\n  -- visual do cartao: acabamento metalico (black, gold...) ou uma foto de fundo (jpeg em data url, ja reduzida)\n  alter table cartoes add column acabamento text;\n  alter table cartoes add column foto text;\n",
   "\n  -- plano do mes: teto de gasto, regras (debito primeiro, sem parcelar...) e quanto cada categoria pode gastar naquele mes\n  create table planos_mes (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, teto real check (teto is null or teto > 0), regras text not null default '{}', unique (perfil_id, mes));\n  create table orcamentos_mes (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, categoria text not null, valor real not null check (valor > 0), unique (perfil_id, mes, categoria));\n",
-  "\n  -- rateio: uma conta dividida entre varias pessoas (churrasco, viagem) e quem ja pagou\n  create table rateios (id text primary key, criado_em text not null, nome text not null, total real not null check (total > 0), data text, encerrado integer not null default 0);\n  create table rateio_pessoas (id text primary key, criado_em text not null, rateio_id text not null references rateios(id) on delete cascade, nome text not null, valor real not null default 0, pago integer not null default 0);\n  create index idx_rateio_pessoas on rateio_pessoas(rateio_id);\n"
+  "\n  -- rateio: uma conta dividida entre varias pessoas (churrasco, viagem) e quem ja pagou\n  create table rateios (id text primary key, criado_em text not null, nome text not null, total real not null check (total > 0), data text, encerrado integer not null default 0);\n  create table rateio_pessoas (id text primary key, criado_em text not null, rateio_id text not null references rateios(id) on delete cascade, nome text not null, valor real not null default 0, pago integer not null default 0);\n  create index idx_rateio_pessoas on rateio_pessoas(rateio_id);\n",
+  "\n  -- cartao passa a ter dono: cada perfil ve so os seus. o cartao antigo vai pro perfil que mais usou ele,\n  -- e se ninguem usou, pro perfil mais antigo. perfil_id vazio = aparece em todos (nao deveria sobrar nenhum)\n  alter table cartoes add column perfil_id text;\n  update cartoes set perfil_id = (select l.perfil_id from lancamentos l where l.cartao_id = cartoes.id and l.perfil_id is not null group by l.perfil_id order by count(*) desc limit 1);\n  update cartoes set perfil_id = (select id from perfis_uso order by criado_em limit 1) where perfil_id is null;\n"
  ],
  "tabelas": {
   "perfis": {
@@ -45,6 +46,7 @@
    "dia_vencimento": "int",
    "acabamento": "txt",
    "foto": "txt",
+   "perfil_id": "txt",
    "id": "txt",
    "criado_em": "txt"
   },
