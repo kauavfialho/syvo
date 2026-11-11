@@ -15,6 +15,14 @@ const BACKUPS_GUARDADOS: usize = 30;
 
 fn pasta_dados(app: &tauri::App) -> PathBuf {
     if let Ok(p) = std::env::var("SYVO_PASTA_DADOS") { return PathBuf::from(p); }
+    // versao portatil do windows (exe com "portable" no nome): os dados ficam numa pasta ao lado do exe
+    if cfg!(windows) {
+        if let Ok(exe) = std::env::current_exe() {
+            if exe.file_name().map(|n| n.to_string_lossy().to_lowercase().contains("portable")).unwrap_or(false) {
+                if let Some(dir) = exe.parent() { return dir.join("Syvo-dados"); }
+            }
+        }
+    }
     let base = app.path().data_dir().expect("sem pasta de dados");
     // em desenvolvimento nunca encosta nos dados reais
     if cfg!(debug_assertions) { base.join("Syvo-tauri-teste") } else { base.join("Syvo") }

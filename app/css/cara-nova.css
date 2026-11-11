@@ -45,12 +45,12 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 /* guia passo a passo */
 .tour-fundo{ position:fixed; inset:0; z-index:200; pointer-events:none; }
 .tour-fundo.on{ pointer-events:auto; }
-.tour-buraco{ position:fixed; z-index:201; border-radius:20px; pointer-events:none; opacity:0; transition:all .55s var(--mola);
+.tour-buraco{ position:fixed; z-index:201; border-radius:20px; pointer-events:none; opacity:0; transition:opacity .22s ease;
   box-shadow:0 0 0 9999px rgba(27,33,26,0.55), 0 0 0 3px rgba(255,255,255,0.9), 0 0 30px 6px rgba(255,255,255,0.35); }
 .tour-buraco.on{ opacity:1; animation:tourPulsa 1.6s ease-in-out infinite; }
 @keyframes tourPulsa{ 50%{ box-shadow:0 0 0 9999px rgba(27,33,26,0.55), 0 0 0 6px rgba(255,255,255,0.6), 0 0 40px 12px rgba(255,255,255,0.3); } }
 .tour-bolha{ position:fixed; z-index:202; width:340px; padding:20px; border-radius:22px; opacity:0; pointer-events:none; transform:translateY(10px) scale(.97);
-  transition:opacity .3s, transform .4s var(--mola), left .55s var(--mola), top .55s var(--mola);
+  transition:opacity .22s ease, transform .3s var(--mola);
   background:rgba(255,253,246,0.9); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); border:1px solid rgba(255,255,255,0.85); box-shadow:0 20px 60px rgba(0,0,0,0.25); }
 .tour-bolha.on{ opacity:1; transform:none; pointer-events:auto; }
 .tour-passo{ font-size:0.78rem; color:var(--ink-soft); font-weight:600; }

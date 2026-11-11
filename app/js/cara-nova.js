@@ -37,7 +37,7 @@
     acoes.prepend(guiaBtn);
     acoes.prepend(wrap);
     $('#btnNovo').addEventListener('click', e => { e.stopPropagation(); wrap.classList.toggle('aberto'); });
-    document.addEventListener('click', e => { if(!wrap.contains(e.target)) wrap.classList.remove('aberto'); });
+    document.addEventListener('click', e => { if(!wrap.contains(e.target) && !document.getElementById('tourBolha')?.classList.contains('on') && !e.target.closest('.tour-bolha')) wrap.classList.remove('aberto'); });
     wrap.querySelectorAll('[data-novo]').forEach(b => b.addEventListener('click', () => {
       wrap.classList.remove('aberto');
       const t = b.dataset.novo;
@@ -72,10 +72,10 @@
   const PASSOS = [
     { alvo: '.topbar-logo', tit: 'Este é o Syvo', txt: 'Tudo fica só no seu computador. Nada vai para a internet, a não ser a cotação de moedas.', acao: 'No ☰ Menu, em Meu perfil, coloque seu nome e sua foto.' },
     { alvo: '#btnWaffle', tit: 'Cadastre seus cartões', txt: 'No Menu ficam Meus cartões, o perfil e o backup. Cadastre cada cartão com a cor e o dia do vencimento.', acao: '👉 Menu → Meus cartões → + Novo cartão.' },
-    { alvo: '.novo-wrap', tit: 'Lance o que entra e o que sai', txt: 'Passe o mouse em + Novo: Gasto para uma compra, Conta mensal para o que se repete, Renda para o salário e A receber quando alguém te deve.', acao: '👉 Comece pela sua Renda do mês.', menu: true },
+    { alvo: '.novo-wrap', tit: 'Lance o que entra e o que sai', txt: 'No + Novo você escolhe o que lançar: Gasto para uma compra, Conta mensal para o que se repete, Renda para o salário e A receber quando alguém te deve.', acao: '👉 Depois do guia, comece pela sua Renda do mês.', menu: true },
     { alvo: '#btnImportarExtrato', tit: 'Ou importe a fatura inteira', txt: 'Baixe a fatura ou o extrato no app do banco (CSV ou OFX) e mande aqui. O Syvo lê linha por linha e você só confere.', acao: '👉 Clique em Importar extrato.', tela: 'mensal' },
-    { alvo: '#painelCategorias', tit: 'Para onde foi o dinheiro', txt: 'Cada categoria com quanto você gastou no mês, comparando com a sua média.', acao: 'Clique em "definir limite" para segurar uma categoria.', tela: 'mensal' },
-    { alvo: '#painelVencimentos', tit: 'Pague sem esquecer', txt: 'Contas e faturas dos cartões por data. Quando pagar, é só marcar ✓ Paguei.', acao: 'Defina o dia de vencimento dos cartões para as faturas aparecerem na data certa.', tela: 'mensal' },
+    { alvo: '#painelCategorias', altura: 170, tit: 'Para onde foi o dinheiro', txt: 'Cada categoria com quanto você gastou no mês, comparando com a sua média.', acao: 'Clique em "definir limite" para segurar uma categoria.', tela: 'mensal' },
+    { alvo: '#painelVencimentos', altura: 170, tit: 'Pague sem esquecer', txt: 'Contas e faturas dos cartões por data. Quando pagar, é só marcar ✓ Paguei.', acao: 'Defina o dia de vencimento dos cartões para as faturas aparecerem na data certa.', tela: 'mensal' },
     { alvo: '#btnAbrirBusca', tit: 'Ache qualquer coisa', txt: 'Busque pelo nome, pela categoria ou pelo valor (por exemplo, 110) em todos os meses.', acao: 'Atalho: ⌘K de qualquer tela.', tela: 'mensal' },
     { alvo: '.doca .view-btn[data-view="plano"]', tit: 'Plano do mês', txt: 'Defina um teto de gasto, quanto pode por categoria e as regras (débito primeiro, sem parcelar). O Syvo mostra quanto você pode gastar por dia.', acao: '👉 Clique em Plano do mês e defina o teto.' },
     { alvo: '.doca', tit: 'Tudo a um clique', txt: 'Aqui embaixo ficam as telas: Início, Plano do mês, Carteira, Imposto de renda, Aprender e Sobre.', acao: 'Pronto! Você vê este guia de novo no botão ?.' }
@@ -88,33 +88,50 @@
   document.body.appendChild(ui);
   const visivel = el => el && el.getClientRects().length > 0 && !el.closest('.hidden');
 
+  // troca de passo: some, rola na hora, reposiciona sem animar e aparece de novo (sem o "deslize" torto)
+  let trocaId = 0;
   function posicionar(){
-    const p = visiveis[passo];
-    if(p.tela && typeof irParaView === 'function') irParaView(p.tela);
-    const wrapNovo = $('.novo-wrap');
-    if(wrapNovo) wrapNovo.classList.toggle('aberto', !!p.menu);
-    const el = $(p.alvo);
-    if(!el){ return proximo(); }
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const p = visiveis[passo], minhaTroca = ++trocaId;
+    const b = $('#tourBuraco'), bol = $('#tourBolha');
+    b.classList.remove('on'); bol.classList.remove('on');
     setTimeout(() => {
-      let r = el.getBoundingClientRect();
-      if(p.menu){ const m = $('.novo-menu').getBoundingClientRect(); r = { left: Math.min(r.left, m.left), top: r.top, right: Math.max(r.right, m.right), bottom: m.bottom }; }
-      const pad = 10, b = $('#tourBuraco');
-      Object.assign(b.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.right - r.left + pad * 2) + 'px', height: (r.bottom - r.top + pad * 2) + 'px' });
-      b.classList.add('on');
-      const bol = $('#tourBolha'), bw = 340, bh = bol.offsetHeight || 260;
-      let x = r.right + 22, y = r.top;
-      if(x + bw > innerWidth - 16) x = r.left - bw - 22;
-      if(x < 16){ x = Math.min(Math.max(16, r.left), innerWidth - bw - 16); y = r.bottom + 22; if(y + bh > innerHeight - 16) y = r.top - bh - 22; }
-      y = Math.max(16, Math.min(y, innerHeight - bh - 16));
-      bol.style.left = x + 'px'; bol.style.top = y + 'px';
-      bol.classList.add('on');
-    }, 420);
-    $('#tourPasso').textContent = `Passo ${passo + 1} de ${visiveis.length}`;
-    $('#tourTit').textContent = p.tit; $('#tourTxt').textContent = p.txt; $('#tourAcao').textContent = p.acao;
-    $('#tourPontos').innerHTML = visiveis.map((_, i) => `<i class="${i === passo ? 'on' : (i < passo ? 'feito' : '')}"></i>`).join('');
-    $('#tourVoltar').style.visibility = passo ? 'visible' : 'hidden';
-    $('#tourProx').textContent = passo === visiveis.length - 1 ? 'Concluir ✓' : 'Próximo →';
+      if(minhaTroca !== trocaId) return;
+      const vTela = p.tela && document.getElementById('view-' + p.tela);
+      if(vTela && vTela.classList.contains('hidden') && typeof irParaView === 'function') irParaView(p.tela);
+      const wrapNovo = $('.novo-wrap');
+      if(wrapNovo) wrapNovo.classList.toggle('aberto', !!p.menu);
+      const el = $(p.alvo);
+      if(!el){ return proximo(); }
+      // painel alto: rola ate o topo dele (abaixo da barra de cima); o resto, centraliza
+      if(p.altura) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 130), behavior: 'auto' });
+      else el.scrollIntoView({ block: 'center', behavior: 'auto' });
+      setTimeout(() => {
+        if(minhaTroca !== trocaId) return;
+        let r = el.getBoundingClientRect();
+        if(p.menu){ const m = $('.novo-menu').getBoundingClientRect(); r = { left: Math.min(r.left, m.left), top: r.top, right: Math.max(r.right, m.right), bottom: m.bottom }; }
+        // painel grande: destaca so o topo dele, senao a luz cobre a tela inteira
+        const maxAlt = p.altura || 0;
+        if(maxAlt && r.bottom - r.top > maxAlt) r = { left: r.left, top: r.top, right: r.right, bottom: r.top + maxAlt };
+        const pad = 10;
+        b.style.transition = 'none';
+        Object.assign(b.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.right - r.left + pad * 2) + 'px', height: (r.bottom - r.top + pad * 2) + 'px' });
+        const bw = 340, bh = bol.offsetHeight || 260;
+        let x = r.right + 22, y = r.top;
+        if(x + bw > innerWidth - 16) x = r.left - bw - 22;
+        if(x < 16){ x = Math.min(Math.max(16, r.left), innerWidth - bw - 16); y = r.bottom + 22; if(y + bh > innerHeight - 16) y = r.top - bh - 22; }
+        y = Math.max(16, Math.min(y, innerHeight - bh - 16));
+        bol.style.transition = 'none';
+        bol.style.left = x + 'px'; bol.style.top = y + 'px';
+        void b.offsetWidth;
+        b.style.transition = ''; bol.style.transition = '';
+        b.classList.add('on'); bol.classList.add('on');
+      }, 60);
+      $('#tourPasso').textContent = `Passo ${passo + 1} de ${visiveis.length}`;
+      $('#tourTit').textContent = p.tit; $('#tourTxt').textContent = p.txt; $('#tourAcao').textContent = p.acao;
+      $('#tourPontos').innerHTML = visiveis.map((_, i) => `<i class="${i === passo ? 'on' : (i < passo ? 'feito' : '')}"></i>`).join('');
+      $('#tourVoltar').style.visibility = passo ? 'visible' : 'hidden';
+      $('#tourProx').textContent = passo === visiveis.length - 1 ? 'Concluir ✓' : 'Próximo →';
+    }, 180);
   }
   function proximo(){ if(passo >= visiveis.length - 1) return fim(true); passo++; posicionar(); }
   function fim(ok){
