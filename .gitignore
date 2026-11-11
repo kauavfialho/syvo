@@ -26,3 +26,7 @@ CLAUDE.md
 
 # prototipos com numeros reais do dono: nunca sobem
 docs/conceitos/
+
+# rust/tauri
+src-tauri/target/
+src-tauri/gen/

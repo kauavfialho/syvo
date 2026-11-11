@@ -70,7 +70,7 @@
       const [m, p, f] = vals[i];
       dica(c, () => linhas(nomeMes(m), so ? [['fatura prevista', formatBRL(p)]] : [['parcelas', formatBRL(p)], ['contas fixas', formatBRL(f)], ['total', formatBRL(p + f)], ...(renda > 0 ? [['da renda', Math.round((p + f) / renda * 100) + '%']] : [])]));
     });
-    requestAnimationFrame(() => requestAnimationFrame(() => el.querySelectorAll('.p,.f').forEach((b, i) => setTimeout(() => b.classList.add('in'), i * 40))));
+    setTimeout(() => el.querySelectorAll('.p,.f').forEach((b, i) => setTimeout(() => b.classList.add('in'), i * 40)), 40);
   }
 
   async function desenharInicio(){
@@ -112,7 +112,7 @@
       </div>`;
 
     ini.querySelectorAll('.tl-degrau').forEach(d => dica(d, () => linhas(d.dataset.n, [['valor', formatBRL(Number(d.dataset.v))]])));
-    requestAnimationFrame(() => requestAnimationFrame(() => ini.querySelectorAll('.tl-degrau .b').forEach((b, i) => setTimeout(() => b.classList.add('in'), 150 + i * 130))));
+    setTimeout(() => ini.querySelectorAll('.tl-degrau .b').forEach((b, i) => setTimeout(() => b.classList.add('in'), 150 + i * 130)), 40);
     ini.querySelectorAll('.tl-cc').forEach(el => el.addEventListener('click', () => { irParaView('cartoes'); setTimeout(() => escolherCartao(el.dataset.id), 200); }));
     const fut = await compromissos(7);
     const alvo = document.getElementById('tlFuturo');
@@ -212,7 +212,7 @@
           <div class="tl-r-pessoas">${r.pessoas.map(p => `<button type="button" class="tl-rp${p.pago ? ' pagou' : ''}" data-p="${p.id}" data-pago="${p.pago ? 1 : 0}"><span class="av">${esc(p.nome).slice(0, 1).toUpperCase()}</span><span><b>${esc(p.nome)}</b><small>${formatBRL(Number(p.valor))}</small></span><span class="st">${p.pago ? 'pagou ✓' : 'falta'}</span></button>`).join('')}</div>
           <div class="tl-acoes"><button type="button" class="btn-primary tl-btn" data-cobrar-r="${r.id}">💬 Cobrar quem falta</button><button type="button" class="btn-secondary tl-btn" data-apagar-r="${r.id}">Excluir</button></div></div>
       </section>`; }).join('')}`;
-    requestAnimationFrame(() => requestAnimationFrame(() => v.querySelectorAll('.tl-r-anel circle.v').forEach(c => { c.style.strokeDashoffset = c.dataset.alvo; })));
+    setTimeout(() => v.querySelectorAll('.tl-r-anel circle.v').forEach(c => { c.style.strokeDashoffset = c.dataset.alvo; }), 40);
     document.getElementById('btnNovoRateio').addEventListener('click', novoRateio);
     v.querySelectorAll('.tl-rp').forEach(b => b.addEventListener('click', async () => {
       const { error } = await sb.from('rateio_pessoas').update({ pago: b.dataset.pago !== '1' }).eq('id', b.dataset.p);

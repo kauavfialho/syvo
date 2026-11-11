@@ -148,7 +148,7 @@
       <div class="pl-dica" id="plDica"></div>`;
 
     // animacoes de entrada
-    requestAnimationFrame(() => requestAnimationFrame(() => {
+    setTimeout(() => {
       if(temTeto){
         const t = r.teto;
         const deb = document.getElementById('plArcDeb'), cre = document.getElementById('plArcCre');
@@ -157,7 +157,7 @@
       }
       box.querySelectorAll('.pl-anel circle.v').forEach(c => { c.style.strokeDashoffset = c.dataset.alvo; });
       box.querySelectorAll('.pl-dias span').forEach((s, i) => setTimeout(() => s.classList.add('in'), i * 18));
-    }));
+    }, 40);
 
     // dicas no mouse
     if(temTeto) dica(document.getElementById('plMedidor'), () => linhasDica('Teto de ' + nm, [['débito e Pix', formatBRL(r.debito)], ['crédito', formatBRL(r.credito)], ['parcelado', formatBRL(r.parcelado)], ['ainda livres', formatBRL(r.livre)], ['teto', formatBRL(r.teto)]], (r.gasto) / r.teto, '#2f6f4f'));

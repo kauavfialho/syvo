@@ -32,7 +32,30 @@ Testar cada tela com uma cópia do banco (`SYVO_PASTA_DADOS`), em pt/en/es, e in
 ### 2. ✅ Pendência anotada (feito na v2.6.1)
 - **Fechamento do mês:** contas pagas no cartão viram uma linha "Fatura <cartão>" que grava em `faturas_pagas`. Está no CLAUDE.md.
 
-### 3. Rust (Tauri 2)
+### 3. Rust (Tauri 2): em andamento
+
+**Feito em 11/11/2026**
+- Rust 1.99 instalado. `src-tauri/` criado, com o núcleo em Rust (`banco.rs` e `lib.rs`).
+- O banco usa as mesmas migrações e tabelas do Electron. `scripts/esquema-para-rust.js` gera `src-tauri/esquema.json` a partir de `electron/banco.js`, então a fonte é uma só.
+- A ponte `app/js/ponte-tauri.js` cria o mesmo `window.syvoNativo`. No Electron ela não faz nada.
+- Proteção do `.db`:
+  - backup do dia antes de abrir;
+  - `integrity_check` a cada abertura;
+  - se o arquivo estiver danificado, guarda o arquivo ruim, volta para o último backup bom e avisa.
+  - Em desenvolvimento, o app usa a pasta `Syvo-tauri-teste`, nunca a real.
+- Testes:
+  - 3 testes do banco em Rust;
+  - equivalência com o Electron: **24/24 consultas iguais**, sobre uma cópia do banco real com 308 lançamentos;
+  - o app em Tauri abriu com a cópia e mostrou tudo certo.
+
+**Falta**
+1. Portar os comandos que ainda respondem "ainda não disponível": exportar, restaurar, mostrar pasta, apagar tudo, comprovantes do IR e atualização automática (via releases do GitHub, como no Electron).
+2. Confirmar que `alert` e `confirm` funcionam no WebKit do Tauri. Se não funcionarem, trocar por diálogos do Rust.
+3. Build release (`npm run tauri:build`): conferir o tamanho e testar.
+4. Trocar o app instalado com backup antes. Depois, CI para Windows e Android.
+
+### Original
+
 O plano está em `docs/IDEIAS.md`, seção 1.
 
 1. Instalar o Rust (rustup) e o Tauri CLI. Pedir o ok do dono antes de instalar.

@@ -11,9 +11,13 @@
     "start": "electron .",
     "test": "node --test testes/*.test.js",
     "dist:mac": "electron-builder --mac --publish never && node -e \"for(const d of ['dist/mac','dist/mac-arm64'])require('fs').rmSync(d,{recursive:true,force:true})\"",
-    "dist:win": "electron-builder --win --publish never"
+    "dist:win": "electron-builder --win --publish never",
+    "tauri:esquema": "node scripts/esquema-para-rust.js",
+    "tauri:dev": "node scripts/esquema-para-rust.js && tauri dev",
+    "tauri:build": "node scripts/esquema-para-rust.js && tauri build"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4",
     "electron": "45.2.1",
     "electron-builder": "26.18.0"
   },

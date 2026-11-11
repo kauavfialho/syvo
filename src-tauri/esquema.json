@@ -1,0 +1,190 @@
+{
+ "migracoes": [
+  "\n  create table perfis (id text primary key, criado_em text not null, nome text, email text, telefone text, sexo text, nascimento text, foto_data text, foto_url text, categorias_custom text, origens_custom text);\n  create table perfis_uso (id text primary key, criado_em text not null, tipo text not null, nome text not null, cor text, unidades text not null default '[]');\n  create table contas_carteira (id text primary key, criado_em text not null, tipo text not null, nome text not null, cor text, gerencia_acoes integer not null default 0);\n  create table cartoes (id text primary key, criado_em text not null, tipo text, nome text not null, limite real, cor text);\n  create table ativos (id text primary key, criado_em text not null, tipo text not null, nome text, valor real not null default 0, dados text not null default '{}', conta_id text);\n  create table alocacoes (id text primary key, criado_em text not null, mes text not null unique, valor_alocado real not null default 0);\n  create table faturas_pagas (id text primary key, criado_em text not null, cartao_id text not null references cartoes(id) on delete cascade, mes text not null, unique (cartao_id, mes));\n  create table meses_fechados (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, fechado_em text, unique (perfil_id, mes));\n  create table orcamentos (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, categoria text not null, valor real not null check (valor > 0), unique (perfil_id, categoria));\n  create table patrimonio_historico (id text primary key, criado_em text not null, mes text not null unique, total real not null default 0, liquido real not null default 0, investido real not null default 0, renda_passiva real not null default 0, atualizado_em text);\n  create table lancamentos (\n    id text primary key, criado_em text not null, tipo text not null, mes text not null, descricao text, valor real not null default 0,\n    dia integer, pago integer not null default 0, recorrente integer not null default 0, grupo_recorrente text, forma_pagamento text,\n    cartao_id text, cartao_nome text, categoria text, fonte_ativo_id text, origem text, recebido integer not null default 0, mes_recebido text,\n    parcela_atual integer, parcela_total integer, grupo_parcelamento text, valor_total_compra real, antecipada_em text, moeda text default 'BRL',\n    cotacao real, data_prevista text, notificado_venc text, perfil_id text, adiada_de text\n  );\n  create index idx_lanc_mes on lancamentos(mes);\n  create index idx_lanc_tipo on lancamentos(tipo);\n  create index idx_lanc_perfil on lancamentos(perfil_id);\n  create index idx_lanc_grupo_rec on lancamentos(grupo_recorrente);\n  create index idx_lanc_grupo_par on lancamentos(grupo_parcelamento);\n  -- apagou o cartao/conta/perfil: o que apontava pra ele so fica solto, nada some junto\n  create trigger cartao_apagado after delete on cartoes begin update lancamentos set cartao_id = null where cartao_id = old.id; end;\n  create trigger conta_apagada after delete on contas_carteira begin update ativos set conta_id = null where conta_id = old.id; end;\n  create trigger perfil_uso_apagado after delete on perfis_uso begin update lancamentos set perfil_id = null where perfil_id = old.id; end;\n  create table ir_itens (id text primary key, criado_em text not null, ano integer not null, ficha text not null, descricao text, valor real not null default 0, dados text not null default '{}', conferido integer not null default 0);\n  create index idx_ir_ano on ir_itens(ano, ficha);\n  -- comprovante fica dentro do banco, assim o backup leva junto\n  create table ir_anexos (id text primary key, criado_em text not null, item_id text not null references ir_itens(id) on delete cascade, nome text not null, conteudo blob not null);\n  create index idx_ir_anexo_item on ir_anexos(item_id);\n",
+  "\n  create table metas (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, tipo text not null check (tipo in ('mes', 'ano')), valor real not null check (valor > 0), unique (perfil_id, tipo));\n  create table dicas_feitas (id text primary key, criado_em text not null, dica_id integer not null unique);\n",
+  "\n  -- importacao de extrato: identificador da linha do banco (para nao importar duas vezes) e o que o app aprendeu\n  alter table lancamentos add column id_externo text;\n  create index idx_lanc_id_externo on lancamentos(id_externo);\n  create table regras_importacao (id text primary key, criado_em text not null, chave text not null unique, tipo text not null, categoria text);\n",
+  "\n  -- dia em que a fatura do cartao vence, pra ela aparecer nos proximos vencimentos\n  alter table cartoes add column dia_vencimento integer check (dia_vencimento between 1 and 31);\n  -- visual do cartao: acabamento metalico (black, gold...) ou uma foto de fundo (jpeg em data url, ja reduzida)\n  alter table cartoes add column acabamento text;\n  alter table cartoes add column foto text;\n",
+  "\n  -- plano do mes: teto de gasto, regras (debito primeiro, sem parcelar...) e quanto cada categoria pode gastar naquele mes\n  create table planos_mes (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, teto real check (teto is null or teto > 0), regras text not null default '{}', unique (perfil_id, mes));\n  create table orcamentos_mes (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, categoria text not null, valor real not null check (valor > 0), unique (perfil_id, mes, categoria));\n",
+  "\n  -- rateio: uma conta dividida entre varias pessoas (churrasco, viagem) e quem ja pagou\n  create table rateios (id text primary key, criado_em text not null, nome text not null, total real not null check (total > 0), data text, encerrado integer not null default 0);\n  create table rateio_pessoas (id text primary key, criado_em text not null, rateio_id text not null references rateios(id) on delete cascade, nome text not null, valor real not null default 0, pago integer not null default 0);\n  create index idx_rateio_pessoas on rateio_pessoas(rateio_id);\n"
+ ],
+ "tabelas": {
+  "perfis": {
+   "nome": "txt",
+   "email": "txt",
+   "telefone": "txt",
+   "sexo": "txt",
+   "nascimento": "txt",
+   "foto_data": "txt",
+   "foto_url": "txt",
+   "categorias_custom": "json",
+   "origens_custom": "json",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "perfis_uso": {
+   "tipo": "txt",
+   "nome": "txt",
+   "cor": "txt",
+   "unidades": "json",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "contas_carteira": {
+   "tipo": "txt",
+   "nome": "txt",
+   "cor": "txt",
+   "gerencia_acoes": "bool",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "cartoes": {
+   "tipo": "txt",
+   "nome": "txt",
+   "limite": "din",
+   "cor": "txt",
+   "dia_vencimento": "int",
+   "acabamento": "txt",
+   "foto": "txt",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "ativos": {
+   "tipo": "txt",
+   "nome": "txt",
+   "valor": "din",
+   "dados": "json",
+   "conta_id": "txt",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "alocacoes": {
+   "mes": "txt",
+   "valor_alocado": "din",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "faturas_pagas": {
+   "cartao_id": "txt",
+   "mes": "txt",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "meses_fechados": {
+   "perfil_id": "txt",
+   "mes": "txt",
+   "fechado_em": "txt",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "orcamentos": {
+   "perfil_id": "txt",
+   "categoria": "txt",
+   "valor": "din",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "planos_mes": {
+   "perfil_id": "txt",
+   "mes": "txt",
+   "teto": "din",
+   "regras": "json",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "orcamentos_mes": {
+   "perfil_id": "txt",
+   "mes": "txt",
+   "categoria": "txt",
+   "valor": "din",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "rateios": {
+   "nome": "txt",
+   "total": "din",
+   "data": "txt",
+   "encerrado": "bool",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "rateio_pessoas": {
+   "rateio_id": "txt",
+   "nome": "txt",
+   "valor": "din",
+   "pago": "bool",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "patrimonio_historico": {
+   "mes": "txt",
+   "total": "din",
+   "liquido": "din",
+   "investido": "din",
+   "renda_passiva": "din",
+   "atualizado_em": "txt",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "lancamentos": {
+   "tipo": "txt",
+   "mes": "txt",
+   "descricao": "txt",
+   "valor": "din",
+   "dia": "int",
+   "pago": "bool",
+   "recorrente": "bool",
+   "grupo_recorrente": "txt",
+   "forma_pagamento": "txt",
+   "cartao_id": "txt",
+   "cartao_nome": "txt",
+   "categoria": "txt",
+   "fonte_ativo_id": "txt",
+   "origem": "txt",
+   "recebido": "bool",
+   "mes_recebido": "txt",
+   "parcela_atual": "int",
+   "parcela_total": "int",
+   "grupo_parcelamento": "txt",
+   "valor_total_compra": "din",
+   "antecipada_em": "txt",
+   "moeda": "txt",
+   "cotacao": "real",
+   "data_prevista": "txt",
+   "notificado_venc": "txt",
+   "perfil_id": "txt",
+   "adiada_de": "txt",
+   "id_externo": "txt",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "ir_itens": {
+   "ano": "int",
+   "ficha": "txt",
+   "descricao": "txt",
+   "valor": "din",
+   "dados": "json",
+   "conferido": "bool",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "metas": {
+   "perfil_id": "txt",
+   "tipo": "txt",
+   "valor": "din",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "dicas_feitas": {
+   "dica_id": "int",
+   "id": "txt",
+   "criado_em": "txt"
+  },
+  "regras_importacao": {
+   "chave": "txt",
+   "tipo": "txt",
+   "categoria": "txt",
+   "id": "txt",
+   "criado_em": "txt"
+  }
+ }
+}
