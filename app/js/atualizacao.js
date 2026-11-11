@@ -21,7 +21,11 @@
     btnNao.classList.add('hidden');
     texto.textContent = 'Preparando a atualização...';
     try {
-      await nativo.atualizacaoInstalar();
+      const r = await nativo.atualizacaoInstalar();
+      if(r && r.abriuPagina){
+        texto.textContent = 'Abri a página de download. Baixe o instalador e abra por cima do Syvo: seus dados ficam.';
+        btnSim.classList.add('hidden'); btnNao.classList.remove('hidden'); btnNao.textContent = 'Fechar';
+      }
     } catch(e){
       const motivo = String(e.message || e).replace(/^Error invoking remote method '[^']+': (Error: )?/, '');
       texto.textContent = 'Não foi possível atualizar: ' + motivo;
