@@ -507,12 +507,14 @@ function irParaView(view){
   document.getElementById('view-ir').classList.toggle('hidden', view !== 'ir');
   document.getElementById('view-sobre').classList.toggle('hidden', view !== 'sobre');
   document.getElementById('view-aprender').classList.toggle('hidden', view !== 'aprender');
+  const vPlano = document.getElementById('view-plano'); if(vPlano) vPlano.classList.toggle('hidden', view !== 'plano');
   const ativo = document.querySelector(`.view-btn[data-view="${view}"]`);
   if(ativo) moverIndicadorNav(ativo);
   window.scrollTo({ top:0, behavior:'smooth' });
   if(view === 'patrimonio') renderPatrimonio();
   if(view === 'ir') irAbrir();
   if(view === 'aprender') aprenderAbrir();
+  if(view === 'plano' && typeof window.planoAbrir === 'function') window.planoAbrir();
   if(view === 'sobre') window.syvoNativo.versao().then(v => { document.getElementById('sobreVersao').textContent = 'Versão ' + v; });
 }
 
@@ -4632,9 +4634,16 @@ async function executarBusca(termo){
   const seq = ++_buscaSeq;   // resposta velha que chega depois nao sobrescreve a nova
   // % e _ sao coringas no ilike: escapa pra buscar o texto literal
   const padrao = '%' + termo.replace(/[\\%_]/g, m => '\\' + m) + '%';
-  let q = tabLanc().select('id, tipo, descricao, valor, moeda, mes, categoria').ilike('descricao', padrao).order('mes', { ascending:false }).limit(50);
-  if(perfilAtivoId) q = q.eq('perfil_id', perfilAtivoId);
-  const { data, error } = await q;
+  // procura no nome e na categoria; se for numero, procura tambem pelo valor (110 acha R$ 110,00)
+  const consulta = campo => { let q = tabLanc().select('id, tipo, descricao, valor, moeda, mes, categoria').ilike(campo, padrao).order('mes', { ascending:false }).limit(50); if(perfilAtivoId) q = q.eq('perfil_id', perfilAtivoId); return q; };
+  const num = parseFloat(termo.replace(/\./g, '').replace(',', '.'));
+  const buscas = [consulta('descricao'), consulta('categoria')];
+  if(/^[\d.,]+$/.test(termo) && !isNaN(num)){ let q = tabLanc().select('id, tipo, descricao, valor, moeda, mes, categoria').gte('valor', Math.floor(num)).lt('valor', Math.floor(num) + 1).order('mes', { ascending:false }).limit(50); if(perfilAtivoId) q = q.eq('perfil_id', perfilAtivoId); buscas.push(q); }
+  const respostas = await Promise.all(buscas);
+  const erro = respostas.find(r => r.error);
+  const vistos = new Set();
+  const data = erro ? null : respostas.flatMap(r => r.data || []).filter(r => !vistos.has(r.id) && vistos.add(r.id)).sort((a, b) => String(b.mes).localeCompare(String(a.mes))).slice(0, 50);
+  const error = erro ? erro.error : null;
   if(seq !== _buscaSeq) return;
   if(error){ info.textContent = 'Não foi possível buscar agora.'; return; }
   const itens = (data || []).map(lancDoBanco);

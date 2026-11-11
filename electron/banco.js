@@ -19,6 +19,8 @@ const TABELAS = {
   faturas_pagas: { cartao_id: 'txt', mes: 'txt' },
   meses_fechados: { perfil_id: 'txt', mes: 'txt', fechado_em: 'txt' },
   orcamentos: { perfil_id: 'txt', categoria: 'txt', valor: 'din' },
+  planos_mes: { perfil_id: 'txt', mes: 'txt', teto: 'din', regras: 'json' },
+  orcamentos_mes: { perfil_id: 'txt', mes: 'txt', categoria: 'txt', valor: 'din' },
   patrimonio_historico: { mes: 'txt', total: 'din', liquido: 'din', investido: 'din', renda_passiva: 'din', atualizado_em: 'txt' },
   lancamentos: {
     tipo: 'txt', mes: 'txt', descricao: 'txt', valor: 'din', dia: 'int', pago: 'bool', recorrente: 'bool',
@@ -81,6 +83,10 @@ const MIGRACOES = [`
   -- visual do cartao: acabamento metalico (black, gold...) ou uma foto de fundo (jpeg em data url, ja reduzida)
   alter table cartoes add column acabamento text;
   alter table cartoes add column foto text;
+`, `
+  -- plano do mes: teto de gasto, regras (debito primeiro, sem parcelar...) e quanto cada categoria pode gastar naquele mes
+  create table planos_mes (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, teto real check (teto is null or teto > 0), regras text not null default '{}', unique (perfil_id, mes));
+  create table orcamentos_mes (id text primary key, criado_em text not null, perfil_id text not null references perfis_uso(id) on delete cascade, mes text not null, categoria text not null, valor real not null check (valor > 0), unique (perfil_id, mes, categoria));
 `];
 
 function abrirBanco(caminho){
