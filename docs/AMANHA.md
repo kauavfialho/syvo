@@ -50,7 +50,10 @@ Testar cada tela com uma cópia do banco (`SYVO_PASTA_DADOS`), em pt/en/es, e in
 
 **Falta**
 1. Portar os comandos que ainda respondem "ainda não disponível": exportar, restaurar, mostrar pasta, apagar tudo, comprovantes do IR e atualização automática (via releases do GitHub, como no Electron).
-2. Confirmar que `alert` e `confirm` funcionam no WebKit do Tauri. Se não funcionarem, trocar por diálogos do Rust.
+2. **Testado em 11/11: `confirm` e `alert` NÃO funcionam no WebKit do Tauri.** O `confirm` devolve "não" sem mostrar nada; no teste, "Recebi tudo" em Pessoas não fez nada. É isso que bloqueia a troca.
+   - Solução: transformar `alert` e `confirm` em diálogos assíncronos (`await confirmar(...)`), com uma janela própria do Syvo (vidro, igual ao guia) ou com o plugin de diálogo do Tauri.
+   - São cerca de 50 lugares em `app.js`, `importar.js`, `ir.js`, `telas.js` e `plano.js`. Os handlers viram `async` e cada `if(!confirm(...))` vira `if(!await confirmar(...))`.
+   - Isso funciona igual no Electron, então dá para fazer e testar antes da troca.
 3. Build release (`npm run tauri:build`): conferir o tamanho e testar.
 4. Trocar o app instalado com backup antes. Depois, CI para Windows e Android.
 
