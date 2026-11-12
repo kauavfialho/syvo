@@ -308,19 +308,19 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
   body{ padding-bottom:calc(110px + env(safe-area-inset-bottom)); }
   .view-nav.doca{ --item:76px; left:50% !important; right:auto !important; bottom:calc(14px + env(safe-area-inset-bottom)) !important; transform:translateX(-50%) !important;
     width:calc(var(--item) * 3 + 12px) !important; max-width:calc(100vw - 108px) !important; margin:0 !important; box-sizing:border-box;
-    gap:0 !important; padding:6px calc(var(--item) + 6px) !important; border-radius:999px !important; align-items:center;
+    gap:0 !important; padding:6px !important; scroll-padding:0 6px; border-radius:999px !important; align-items:center;
     overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain;
-    -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%); mask-image:linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%); }
+  }
   .view-nav.doca::-webkit-scrollbar{ display:none; }
   .view-nav.doca{ background:rgba(255,253,246,0.9) !important; backdrop-filter:blur(22px) saturate(160%) !important; -webkit-backdrop-filter:blur(22px) saturate(160%) !important; box-shadow:0 12px 32px rgba(0,0,0,0.16) !important; }
   .view-nav.doca .view-nav-indicator{ display:none !important; }
-  .view-nav.doca .view-btn{ --roda:1; flex:0 0 var(--item); width:var(--item) !important; height:62px !important; padding:4px 2px !important; scroll-snap-align:center;
+  .view-nav.doca .view-btn{ --roda:1; flex:0 0 var(--item); width:var(--item) !important; height:62px !important; padding:4px 2px !important; scroll-snap-align:start;
     display:flex !important; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:999px !important; color:var(--ink);
-    transform:scale(calc(1.08 - var(--roda) * 0.22)) !important; opacity:calc(1 - var(--roda) * 0.45); transition:transform .12s linear, opacity .12s linear; }
-  .view-nav.doca .view-btn:hover{ transform:scale(calc(1.08 - var(--roda) * 0.22)) !important; }
+    transform:none !important; transition:none !important; }
+  .view-nav.doca .view-btn:hover{ transform:none !important; }
   .view-nav.doca .view-btn::after, .view-nav.doca .view-btn.active .nav-icone::after{ display:none !important; content:none !important; }
   .view-nav.doca .view-btn .nav-icone{ font-size:1.45rem !important; line-height:1; width:44px; height:34px; display:grid !important; place-items:center; border-radius:999px; transition:background .2s; }
-  .view-nav.doca .view-btn.active .nav-icone{ background:rgba(27,33,26,0.1); }
+  .view-nav.doca .view-btn.active{ background:rgba(27,33,26,0.09); }
   .view-nav.doca .view-btn .nav-rotulo{ display:block !important; font-size:0.68rem !important; font-weight:600; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
   .view-nav.doca .view-btn:has(.nav-curto) .nav-rotulo{ display:none !important; }
   .view-nav.doca .view-btn .nav-curto{ display:block; font-size:0.68rem; font-weight:600; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
@@ -336,6 +336,8 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
   /* topo enxuto: o idioma continua em configuracoes */
   .app-topbar .seletor-idioma{ display:none !important; }
   .novo-btn{ white-space:nowrap; }
+  /* menu do + novo: no celular ocupa a largura toda, centralizado, em vez de vazar pela esquerda */
+  .novo-menu{ position:fixed !important; left:12px !important; right:12px !important; width:auto !important; top:var(--novo-top, 96px) !important; max-width:420px; margin:0 auto; transform-origin:top center !important; }
   .topbar-actions{ gap:6px !important; flex-wrap:nowrap !important; }
 }
 @media (max-width:420px){

@@ -29,19 +29,17 @@
       const s = document.createElement('button');
       s.type = 'button'; s.className = 'roda-seta roda-' + lado; s.setAttribute('aria-label', lado === 'ant' ? 'Telas anteriores' : 'Próximas telas');
       s.textContent = lado === 'ant' ? '‹' : '›';
-      s.addEventListener('click', () => nav.scrollBy({ left: (lado === 'ant' ? -1 : 1) * passoRoda(), behavior: 'smooth' }));
+      s.addEventListener('click', () => nav.scrollBy({ left: (lado === 'ant' ? -3 : 3) * passoRoda(), behavior: 'smooth' }));
       document.body.appendChild(s);
       return s;
     });
     const botoes = [...nav.querySelectorAll('.view-btn')];
     const passoRoda = () => (botoes[0] ? botoes[0].getBoundingClientRect().width : 76);
-    // quanto mais longe do meio, menor e mais apagado o icone
+    // so apaga a seta quando nao tem mais nada daquele lado (sem efeito de escala: tremia no arrasto)
     let quadro = null;
     const pintarRoda = () => {
       quadro = null;
-      if(!celular.matches){ botoes.forEach(b => b.style.removeProperty('--roda')); return; }
-      const r = nav.getBoundingClientRect(), meio = r.left + r.width / 2, p = passoRoda();
-      botoes.forEach(b => { const c = b.getBoundingClientRect(); const d = Math.min(Math.abs(c.left + c.width / 2 - meio) / p, 1.6); b.style.setProperty('--roda', d.toFixed(3)); });
+      if(!celular.matches) return;
       setas[0].classList.toggle('apagada', nav.scrollLeft < 4);
       setas[1].classList.toggle('apagada', nav.scrollLeft > nav.scrollWidth - nav.clientWidth - 4);
     };
@@ -49,11 +47,13 @@
     nav.addEventListener('scroll', pedirPintura, { passive: true });
     // roda do mouse (pra cima e pra baixo) tambem gira a roda
     nav.addEventListener('wheel', e => { if(!celular.matches || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; e.preventDefault(); nav.scrollBy({ left: e.deltaY }); }, { passive: false });
-    // a tela aberta vai pro meio da roda
+    // se a tela aberta estiver fora dos 3 que aparecem, a roda anda ate ela
     const centralizar = (suave) => {
       if(!celular.matches) return;
       const a = nav.querySelector('.view-btn.active'); if(!a) return;
-      nav.scrollTo({ left: a.offsetLeft + a.offsetWidth / 2 - nav.clientWidth / 2, behavior: suave ? 'smooth' : 'auto' });
+      const ini = nav.scrollLeft, fim = ini + nav.clientWidth;
+      if(a.offsetLeft >= ini && a.offsetLeft + a.offsetWidth <= fim) return;
+      nav.scrollTo({ left: a.offsetLeft - 6, behavior: suave ? 'smooth' : 'auto' });
     };
     new MutationObserver(() => setTimeout(() => centralizar(true), 30)).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
     const aoMudar = () => { centralizar(false); pintarRoda(); };
@@ -82,7 +82,10 @@
     acoes.prepend(wrap);
     // so um menu aberto por vez: abrir o "+ novo" fecha o menu e o "mais", e vice-versa
     const fecharMenu = () => { const m = document.getElementById('waffleMenu'); if(m) m.classList.add('hidden'); };
-    $('#btnNovo').addEventListener('click', e => { e.stopPropagation(); fecharMenu(); window.syvoFecharGaveta?.(); wrap.classList.toggle('aberto'); });
+    // o menu no celular e fixo na tela: fica logo abaixo do botao
+    const posMenu = () => { const r = $('#btnNovo').getBoundingClientRect(); wrap.style.setProperty('--novo-top', Math.round(r.bottom + 10) + 'px'); };
+    wrap.addEventListener('mouseenter', posMenu);
+    $('#btnNovo').addEventListener('click', e => { posMenu(); e.stopPropagation(); fecharMenu(); window.syvoFecharGaveta?.(); wrap.classList.toggle('aberto'); });
     wrap.addEventListener('mouseenter', () => { if(matchMedia('(hover:hover)').matches) fecharMenu(); });
     const bw = document.getElementById('btnWaffle');
     if(bw) bw.addEventListener('click', () => { wrap.classList.remove('aberto'); window.syvoFecharGaveta?.(); });
