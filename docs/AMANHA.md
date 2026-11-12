@@ -1,6 +1,7 @@
 # Para amanhã (12/11/2026)
 
-> **Próximo passo combinado (11/11 à noite): começar a versão Android pelo Tauri.**
+> **Android: primeira versão feita em 12/11 (v2.9.0, APK de 15 MB).** Falta: Android no CI (chave como segredo), exportar backup no celular e sincronizar com o Mac.
+> ~~Próximo passo combinado (11/11 à noite): começar a versão Android pelo Tauri.~~
 > A tela de celular já existe (v2.8.x): roda de 3 ícones embaixo, topo enxuto e menu do + Novo em largura total.
 > Falta: instalar Android SDK e NDK (pedir antes), `tauri android init`, trocar o que é só de computador
 > (escolher arquivo, backup, comprovantes do IR) e decidir como os dados chegam ao celular (arquivo próprio ou sincronizar).
