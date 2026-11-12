@@ -1,7 +1,7 @@
 name: Instaladores
 
 # criar uma tag v2.7.0 (ou rodar na mao pela aba Actions) gera os instaladores da versao em rust (tauri)
-# para mac e windows e publica tudo numa Release do GitHub, pronto pra baixar.
+# para mac, windows e android e publica tudo numa Release do GitHub, pronto pra baixar.
 # os nomes dos arquivos nao mudam de versao para versao: os links do README apontam para releases/latest.
 on:
   push:
@@ -77,8 +77,53 @@ jobs:
           path: saida/*
           if-no-files-found: error
 
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager "ndk;27.2.12479018" "platforms;android-35" "build-tools;35.0.0"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      # a chave de assinatura vem dos segredos do repositorio. sem ela o android nao deixa
+      # instalar uma versao nova por cima da antiga, entao tem que ser sempre a mesma
+      - name: Prepara a chave de assinatura
+        env:
+          CHAVE: ${{ secrets.ANDROID_KEYSTORE }}
+          SENHA: ${{ secrets.ANDROID_KEYSTORE_SENHA }}
+        run: |
+          test -n "$CHAVE" || { echo "falta o segredo ANDROID_KEYSTORE"; exit 1; }
+          echo "$CHAVE" | base64 -d > "$RUNNER_TEMP/syvo.jks"
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=syvo\nstoreFile=%s\n' "$SENHA" "$SENHA" "$RUNNER_TEMP/syvo.jks" > src-tauri/gen/android/keystore.properties
+      - name: Monta o APK
+        run: |
+          export NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018"
+          npx tauri android build --apk --target aarch64 armv7
+          mkdir -p saida
+          cp src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk saida/Syvo-android.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify saida/Syvo-android.apk
+          ls -la saida
+      - uses: actions/upload-artifact@v4
+        with:
+          name: instaladores-android
+          path: saida/*
+          if-no-files-found: error
+
   publicar:
-    needs: [mac, windows]
+    needs: [mac, windows, android]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
@@ -93,4 +138,4 @@ jobs:
           gh release create "$GITHUB_REF_NAME" instaladores/* \
             --repo "$GITHUB_REPOSITORY" \
             --title "Syvo $GITHUB_REF_NAME" \
-            --notes "Versão em Rust (Tauri): instaladores de poucos MB. Baixe o .dmg no Mac ou o .exe no Windows; a versão portátil é o .zip no Mac e o -portable.exe no Windows. Seus dados continuam: o app novo abre o mesmo arquivo do anterior. Veja o README para abrir o app na primeira vez."
+            --notes "Versão em Rust (Tauri): instaladores de poucos MB. Baixe o .dmg no Mac, o .exe no Windows ou o Syvo-android.apk no celular Android; a versão portátil é o .zip no Mac e o -portable.exe no Windows. Seus dados continuam: o app novo abre o mesmo arquivo do anterior. Veja o README para abrir o app na primeira vez."
