@@ -20,42 +20,46 @@
     const ativo = nav.querySelector('.view-btn.active');
     if(ativo && typeof moverIndicadorNav === 'function') setTimeout(() => moverIndicadorNav(ativo), 50);
 
-    // tela estreita e celular: a doca vira barra de abas com nome embaixo do icone.
-    // so as 4 principais ficam na barra, o resto vai pro "mais" (uma gaveta que sobe de baixo)
-    const PRINCIPAIS = ['mensal', 'lanc', 'cartoes', 'plano'];
-    nav.querySelectorAll('.view-btn').forEach(b => { if(!PRINCIPAIS.includes(b.dataset.view)) b.classList.add('doca-extra'); });
-    // nome curto embaixo do icone, pra caber no celular
-    const CURTOS = { lanc: 'Lançamentos', plano: 'Plano' };
+    // celular: a doca vira uma roda de icones. aparecem 3 por vez, o do meio fica em destaque,
+    // e a pessoa arrasta pro lado (ou usa as setas) para ver as outras telas. tocar abre a tela.
+    const CURTOS = { lanc: 'Lançamentos', plano: 'Plano', patrimonio: 'Carteira', ir: 'Imposto' };
     Object.entries(CURTOS).forEach(([v, t]) => { const b = nav.querySelector(`.view-btn[data-view="${v}"]`); if(b){ const c = document.createElement('span'); c.className = 'nav-curto'; c.textContent = t; b.appendChild(c); } });
-    const mais = document.createElement('button');
-    mais.type = 'button'; mais.className = 'doca-mais'; mais.setAttribute('aria-label', 'Mais');
-    mais.innerHTML = '<span class="nav-icone" aria-hidden="true">•••</span><span class="nav-rotulo">Mais</span>';
-    nav.appendChild(mais);
-    const gaveta = document.createElement('div');
-    gaveta.className = 'doca-gaveta'; gaveta.hidden = true;
-    gaveta.innerHTML = `<div class="dg-fundo"></div><div class="dg-caixa" role="menu"><div class="dg-alca"></div>${
-      [...nav.querySelectorAll('.view-btn.doca-extra')].map(b => `<button type="button" class="dg-item" data-ir="${b.dataset.view}"><span class="e">${b.querySelector('.nav-icone').textContent}</span><span>${b.dataset.nome}</span></button>`).join('')
-    }</div>`;
-    document.body.appendChild(gaveta);
-    const fecharGaveta = () => { gaveta.classList.remove('aberta'); setTimeout(() => { gaveta.hidden = true; }, 250); };
-    window.syvoFecharGaveta = () => { if(!gaveta.hidden) fecharGaveta(); };
-    mais.addEventListener('click', () => {
-      if(!gaveta.hidden){ fecharGaveta(); return; }
-      document.getElementById('waffleMenu')?.classList.add('hidden');
-      document.querySelector('.novo-wrap')?.classList.remove('aberto');
-      gaveta.querySelectorAll('.dg-item').forEach(i => i.classList.toggle('ativo', !!nav.querySelector(`.view-btn.active[data-view="${i.dataset.ir}"]`)));
-      gaveta.hidden = false; setTimeout(() => gaveta.classList.add('aberta'), 10);
+    const celular = matchMedia('(max-width:700px)');
+    const setas = ['ant', 'prox'].map(lado => {
+      const s = document.createElement('button');
+      s.type = 'button'; s.className = 'roda-seta roda-' + lado; s.setAttribute('aria-label', lado === 'ant' ? 'Telas anteriores' : 'Próximas telas');
+      s.textContent = lado === 'ant' ? '‹' : '›';
+      s.addEventListener('click', () => nav.scrollBy({ left: (lado === 'ant' ? -1 : 1) * passoRoda(), behavior: 'smooth' }));
+      document.body.appendChild(s);
+      return s;
     });
-    gaveta.querySelector('.dg-fundo').addEventListener('click', fecharGaveta);
-    gaveta.querySelectorAll('.dg-item').forEach(i => i.addEventListener('click', () => {
-      const b = nav.querySelector(`.view-btn[data-view="${i.dataset.ir}"]`);
-      if(b) b.click();
-      fecharGaveta();
-    }));
-    // o "mais" fica marcado quando a tela aberta e uma das que estao dentro dele
-    const marcarMais = () => mais.classList.toggle('active', !!nav.querySelector('.view-btn.doca-extra.active'));
-    new MutationObserver(marcarMais).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
-    marcarMais();
+    const botoes = [...nav.querySelectorAll('.view-btn')];
+    const passoRoda = () => (botoes[0] ? botoes[0].getBoundingClientRect().width : 76);
+    // quanto mais longe do meio, menor e mais apagado o icone
+    let quadro = null;
+    const pintarRoda = () => {
+      quadro = null;
+      if(!celular.matches){ botoes.forEach(b => b.style.removeProperty('--roda')); return; }
+      const r = nav.getBoundingClientRect(), meio = r.left + r.width / 2, p = passoRoda();
+      botoes.forEach(b => { const c = b.getBoundingClientRect(); const d = Math.min(Math.abs(c.left + c.width / 2 - meio) / p, 1.6); b.style.setProperty('--roda', d.toFixed(3)); });
+      setas[0].classList.toggle('apagada', nav.scrollLeft < 4);
+      setas[1].classList.toggle('apagada', nav.scrollLeft > nav.scrollWidth - nav.clientWidth - 4);
+    };
+    const pedirPintura = () => { if(!quadro) quadro = setTimeout(pintarRoda, 16); };
+    nav.addEventListener('scroll', pedirPintura, { passive: true });
+    // roda do mouse (pra cima e pra baixo) tambem gira a roda
+    nav.addEventListener('wheel', e => { if(!celular.matches || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; e.preventDefault(); nav.scrollBy({ left: e.deltaY }); }, { passive: false });
+    // a tela aberta vai pro meio da roda
+    const centralizar = (suave) => {
+      if(!celular.matches) return;
+      const a = nav.querySelector('.view-btn.active'); if(!a) return;
+      nav.scrollTo({ left: a.offsetLeft + a.offsetWidth / 2 - nav.clientWidth / 2, behavior: suave ? 'smooth' : 'auto' });
+    };
+    new MutationObserver(() => setTimeout(() => centralizar(true), 30)).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class'] });
+    const aoMudar = () => { centralizar(false); pintarRoda(); };
+    celular.addEventListener('change', aoMudar);
+    addEventListener('resize', pedirPintura);
+    setTimeout(aoMudar, 300);
   }
 
   // ---- "+ Novo" no topo, com menu ao passar o mouse ----

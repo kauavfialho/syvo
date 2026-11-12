@@ -302,38 +302,37 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 /* na doca o icone e o botao inteiro: nunca some (o facil.css escondia em tela estreita e com letra grande) */
 .view-nav.doca .view-btn .nav-icone, html[data-letra] .view-nav.doca .view-btn .nav-icone{ display:inline-block !important; margin:0 !important; }
 
-/* ---- tela estreita e celular: doca vira barra de abas presa embaixo ---- */
-.doca-mais, .doca-gaveta, .nav-curto{ display:none; }
+/* ---- celular: a doca vira uma roda de icones, 3 por vez, arrasta pro lado ---- */
+.nav-curto, .roda-seta{ display:none; }
 @media (max-width:700px){
-  body{ padding-bottom:calc(84px + env(safe-area-inset-bottom)); }
-  .view-nav.doca{ left:0 !important; right:0 !important; bottom:0 !important; transform:none !important; width:100% !important; max-width:none !important; margin:0 !important; box-sizing:border-box; justify-content:space-around; align-items:stretch; gap:0 !important;
-    padding:6px 6px calc(6px + env(safe-area-inset-bottom)) !important; border-radius:22px 22px 0 0 !important; border-bottom:0 !important; }
+  body{ padding-bottom:calc(110px + env(safe-area-inset-bottom)); }
+  .view-nav.doca{ --item:76px; left:50% !important; right:auto !important; bottom:calc(14px + env(safe-area-inset-bottom)) !important; transform:translateX(-50%) !important;
+    width:calc(var(--item) * 3 + 12px) !important; max-width:calc(100vw - 108px) !important; margin:0 !important; box-sizing:border-box;
+    gap:0 !important; padding:6px calc(var(--item) + 6px) !important; border-radius:999px !important; align-items:center;
+    overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain;
+    -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%); mask-image:linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%); }
+  .view-nav.doca::-webkit-scrollbar{ display:none; }
+  .view-nav.doca{ background:rgba(255,253,246,0.9) !important; backdrop-filter:blur(22px) saturate(160%) !important; -webkit-backdrop-filter:blur(22px) saturate(160%) !important; box-shadow:0 12px 32px rgba(0,0,0,0.16) !important; }
   .view-nav.doca .view-nav-indicator{ display:none !important; }
-  .view-nav.doca .view-btn.doca-extra{ display:none !important; }
-  .view-nav.doca .view-btn, .view-nav.doca .doca-mais{ flex:1 1 0; min-width:0; max-width:96px; width:auto !important; height:auto !important; min-height:58px; padding:6px 2px 4px !important;
-    display:flex !important; flex-direction:column; align-items:center; justify-content:center; gap:3px; border:0; border-radius:14px !important; background:transparent; color:var(--ink-soft); font:inherit; cursor:pointer; }
-  .view-nav.doca .view-btn:hover{ transform:none; }
+  .view-nav.doca .view-btn{ --roda:1; flex:0 0 var(--item); width:var(--item) !important; height:62px !important; padding:4px 2px !important; scroll-snap-align:center;
+    display:flex !important; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:999px !important; color:var(--ink);
+    transform:scale(calc(1.08 - var(--roda) * 0.22)) !important; opacity:calc(1 - var(--roda) * 0.45); transition:transform .12s linear, opacity .12s linear; }
+  .view-nav.doca .view-btn:hover{ transform:scale(calc(1.08 - var(--roda) * 0.22)) !important; }
   .view-nav.doca .view-btn::after, .view-nav.doca .view-btn.active .nav-icone::after{ display:none !important; content:none !important; }
-  .view-nav.doca .view-btn .nav-icone, .view-nav.doca .doca-mais .nav-icone{ font-size:1.3rem !important; line-height:1; padding:3px 14px; border-radius:999px; transition:background .2s; }
-  .view-nav.doca .view-btn .nav-rotulo, .view-nav.doca .doca-mais .nav-rotulo{ display:block !important; font-size:0.72rem !important; font-weight:600; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
-  .view-nav.doca .doca-mais .nav-icone{ display:inline-block !important; font-weight:800; letter-spacing:1px; }
+  .view-nav.doca .view-btn .nav-icone{ font-size:1.45rem !important; line-height:1; width:44px; height:34px; display:grid !important; place-items:center; border-radius:999px; transition:background .2s; }
+  .view-nav.doca .view-btn.active .nav-icone{ background:rgba(27,33,26,0.1); }
+  .view-nav.doca .view-btn .nav-rotulo{ display:block !important; font-size:0.68rem !important; font-weight:600; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
   .view-nav.doca .view-btn:has(.nav-curto) .nav-rotulo{ display:none !important; }
-  .view-nav.doca .view-btn .nav-curto{ display:block; font-size:0.72rem; font-weight:600; line-height:1.1; white-space:nowrap; }
-  .view-nav.doca .view-btn.active, .view-nav.doca .doca-mais.active{ color:var(--ink); }
-  .view-nav.doca .view-btn.active .nav-icone, .view-nav.doca .doca-mais.active .nav-icone{ background:rgba(27,33,26,0.1); }
-  /* gaveta do "mais" */
-  .doca-gaveta{ display:block; position:fixed; inset:0; z-index:59; }
-  .doca-gaveta[hidden]{ display:none; }
-  .dg-fundo{ position:absolute; inset:0; background:rgba(27,33,26,0.3); opacity:0; transition:opacity .25s; }
-  .dg-caixa{ position:absolute; left:8px; right:8px; bottom:calc(84px + env(safe-area-inset-bottom)); padding:8px 8px 10px; border-radius:22px;
-    background:rgba(255,253,246,0.94); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); border:1px solid rgba(255,255,255,0.85); box-shadow:0 18px 50px rgba(0,0,0,0.2);
-    transform:translateY(20px); opacity:0; transition:transform .3s cubic-bezier(.2,.9,.25,1.15), opacity .25s; }
-  .doca-gaveta.aberta .dg-fundo{ opacity:1; }
-  .doca-gaveta.aberta .dg-caixa{ transform:none; opacity:1; }
-  .dg-alca{ width:40px; height:4px; border-radius:4px; background:rgba(27,33,26,0.18); margin:2px auto 8px; }
-  .dg-item{ display:flex; align-items:center; gap:14px; width:100%; padding:12px; border:0; border-radius:14px; background:transparent; color:var(--ink); font:inherit; font-size:1rem; font-weight:600; text-align:left; cursor:pointer; }
-  .dg-item .e{ font-size:1.3rem; width:40px; height:40px; display:grid; place-items:center; border-radius:12px; background:rgba(27,33,26,0.06); }
-  .dg-item:hover, .dg-item.ativo{ background:rgba(27,33,26,0.07); }
+  .view-nav.doca .view-btn .nav-curto{ display:block; font-size:0.68rem; font-weight:600; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .view-nav.doca .view-btn.active .nav-rotulo, .view-nav.doca .view-btn.active .nav-curto{ font-weight:800; }
+  /* setas dos lados da roda */
+  .roda-seta{ display:grid; place-items:center; position:fixed; z-index:61; bottom:calc(14px + 19px + env(safe-area-inset-bottom)); width:38px; height:38px; border-radius:50%;
+    border:1px solid rgba(255,255,255,0.8); background:rgba(255,253,246,0.82); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    color:var(--ink); font-size:1.5rem; line-height:1; padding:0 0 3px; cursor:pointer; transition:opacity .2s, transform .2s; }
+  .roda-seta:active{ transform:scale(.9); }
+  .roda-seta.apagada{ opacity:.3; pointer-events:none; }
+  .roda-ant{ right:calc(50% + min(var(--meia, 120px), 50vw - 54px) + 8px); }
+  .roda-prox{ left:calc(50% + min(var(--meia, 120px), 50vw - 54px) + 8px); }
   /* topo enxuto: o idioma continua em configuracoes */
   .app-topbar .seletor-idioma{ display:none !important; }
   .novo-btn{ white-space:nowrap; }
@@ -342,7 +341,6 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 @media (max-width:420px){
   .waffle-btn{ font-size:0 !important; padding:8px 12px !important; }
   .waffle-btn .menu-icone{ font-size:1.1rem; }
-  .view-nav.doca .view-btn .nav-rotulo, .view-nav.doca .doca-mais .nav-rotulo{ font-size:0.68rem !important; }
 }
 
 /* ---- importar extrato: janela no mesmo vidro das outras, nada de retangulo reto ---- */
@@ -364,4 +362,3 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 #modalImportar .imp-item, #modalImportar .imp-aviso{ border-radius:14px; }
 #modalImportar .modal-actions button{ border-radius:999px !important; }
 @media (max-width:560px){ #modalImportar .imp-origem, #modalImportar .imp-linha{ grid-template-columns:1fr; } #modalImportar .imp-modal{ padding:20px !important; } }
-@media (max-width:400px){ .view-nav.doca .view-btn .nav-curto, .view-nav.doca .view-btn .nav-rotulo, .view-nav.doca .doca-mais .nav-rotulo{ font-size:0.62rem !important; letter-spacing:-0.01em; } }
