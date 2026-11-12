@@ -177,7 +177,7 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 .tl-pilha:hover .tl-cc:nth-child(2){ transform:translate(-60px,6px) rotate(-5deg); }
 .tl-pilha:hover .tl-cc:nth-child(3){ transform:translate(60px,6px) rotate(5deg); }
 .tl-pilha:hover .tl-cc:nth-child(4){ transform:translate(180px,26px) rotate(13deg); }
-.tl-pilha .tl-cc:hover{ z-index:5; }
+.tl-pilha .tl-cc:hover .cartao-visual{ box-shadow:0 18px 40px rgba(0,0,0,0.3); }
 .tl-cc .cartao-visual{ min-height:0; box-shadow:0 12px 30px rgba(0,0,0,0.22); }
 .tl-pilha .tl-fat{ position:absolute; right:14px; bottom:12px; font-family:'Space Mono',monospace; font-weight:700; color:#fff; font-size:0.85rem; text-shadow:0 1px 3px rgba(0,0,0,0.4); }
 .tl-uso{ display:flex; height:10px; border-radius:99px; overflow:hidden; margin-top:16px; background:rgba(34,41,31,0.08); }
@@ -364,3 +364,9 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 #modalImportar .imp-item, #modalImportar .imp-aviso{ border-radius:14px; }
 #modalImportar .modal-actions button{ border-radius:999px !important; }
 @media (max-width:560px){ #modalImportar .imp-origem, #modalImportar .imp-linha{ grid-template-columns:1fr; } #modalImportar .imp-modal{ padding:20px !important; } }
+
+/* paineis do inicio levam pra tela deles */
+.tl-link{ cursor:pointer; transition:transform .25s var(--mola), box-shadow .25s; }
+.tl-link:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(60,70,40,0.14); }
+.tl-ver{ font-weight:600; color:var(--ink) !important; }
+.tl-link:hover .tl-ver{ text-decoration:underline; }

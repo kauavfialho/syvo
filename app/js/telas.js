@@ -93,21 +93,21 @@
 
     ini.innerHTML = `
       <div class="tl-grade2">
-        <div class="tl-painel tl-saldo">
+        <div class="tl-painel tl-saldo tl-link" data-ir="lanc" title="Ver os lançamentos do mês">
           <div class="tl-rot">Saldo de ${nomeMes(mk).toLowerCase()}</div>
           <div class="tl-valor" style="color:${saldo < 0 ? 'var(--expense)' : 'var(--income)'}">${formatBRL(saldo)}</div>
           ${aReceber > 0 ? `<div class="tl-frase">Ainda faltam <b>${formatBRL(aReceber)}</b> para entrar. Com isso, o mês fecha em <b>${formatBRL(comReceber)}</b>.</div>` : '<div class="tl-frase">&nbsp;</div>'}
           <div class="tl-cascata">${passos.map(([n, v, de, ate, cor]) => `<div class="tl-degrau" data-n="${n}" data-v="${v}"><div class="b" style="bottom:${alt(Math.min(de, ate))}%;height:${Math.max(alt(Math.max(de, ate)) - alt(Math.min(de, ate)), 1.5)}%;background:linear-gradient(180deg,${cor}dd,${cor})"></div><div class="t">${n}<b>${(v > 0 && n !== 'Entrou' && n !== 'Saldo' ? '+' : '')}${curto(v)}</b></div></div>`).join('')}</div>
         </div>
-        <div class="tl-painel">
-          <div class="tl-topo"><h3>Cartões</h3><span class="tl-sub">passe o mouse</span></div>
+        <div class="tl-painel tl-link" data-ir="cartoes" title="Ver os cartões">
+          <div class="tl-topo"><h3>Cartões</h3><span class="tl-sub tl-ver">ver cartões →</span></div>
           ${cartoes.length ? `<div class="tl-pilha">${cartoes.map(x => `<div class="tl-cc" style="--cor:${x.c.cor || '#8A867B'}" data-id="${x.c.id}">${htmlCartaoVisual(x.c)}<div class="tl-fat"><small>fatura</small>${formatBRL(x.v)}</div></div>`).join('')}</div>
           <div class="tl-uso">${cartoes.map(x => `<span style="width:${x.v / totalCart * 100}%;background:${x.c.cor || '#8A867B'}" title="${esc(x.c.nome)}"></span>`).join('')}</div>
           <div class="tl-leg">${cartoes.map(x => `<span><i style="background:${x.c.cor || '#8A867B'}"></i>${esc(x.c.nome)} ${Math.round(x.v / totalCart * 100)}%</span>`).join('')}</div>`
           : '<p class="tl-vazio">Cadastre seus cartões no Menu → Meus cartões.</p>'}
         </div>
       </div>
-      <div class="tl-painel">
+      <div class="tl-painel tl-link" data-ir="lanc" title="Ver os lançamentos">
         <div class="tl-topo"><h3>Já comprometido nos próximos meses</h3><span class="tl-sub">parcelas + contas fixas</span></div>
         <div class="tl-barras" id="tlFuturo"></div>
         <div class="tl-leg"><span><i style="background:#b8791f"></i>parcelas</span><span><i style="background:#2f6f4f"></i>contas fixas</span>${renda > 0 ? '<span><i class="tracejado"></i>sua renda</span>' : ''}</div>
@@ -115,7 +115,19 @@
 
     ini.querySelectorAll('.tl-degrau').forEach(d => dica(d, () => linhas(d.dataset.n, [['valor', formatBRL(Number(d.dataset.v))]])));
     setTimeout(() => ini.querySelectorAll('.tl-degrau .b').forEach((b, i) => setTimeout(() => b.classList.add('in'), 150 + i * 130)), 40);
-    ini.querySelectorAll('.tl-cc').forEach(el => el.addEventListener('click', () => { irParaView('cartoes'); setTimeout(() => escolherCartao(el.dataset.id), 200); }));
+    ini.querySelectorAll('.tl-cc').forEach(el => el.addEventListener('click', e => { e.stopPropagation(); irParaView('cartoes'); setTimeout(() => escolherCartao(el.dataset.id), 200); }));
+    // clicar no painel leva pra tela dele (saldo e comprometido -> lancamentos, cartoes -> cartoes)
+    ini.querySelectorAll('.tl-link').forEach(p => p.addEventListener('click', e => { if(e.target.closest('a, button, .tl-cc')) return; irParaView(p.dataset.ir); }));
+    // escadinha: o cartao em foco fica por cima e os outros vao ficando por baixo conforme a distancia,
+    // tanto pra esquerda quanto pra direita. sem foco, a pilha fica na ordem normal
+    const pilha = ini.querySelector('.tl-pilha');
+    if(pilha){
+      const ccs = [...pilha.querySelectorAll('.tl-cc')];
+      const escada = foco => ccs.forEach((c, j) => { c.style.zIndex = foco == null ? j + 1 : 20 - Math.abs(j - foco); });
+      ccs.forEach((c, i) => c.addEventListener('mouseenter', () => escada(i)));
+      pilha.addEventListener('mouseleave', () => escada(null));
+      escada(null);
+    }
     const fut = await compromissos(7);
     const alvo = document.getElementById('tlFuturo');
     if(fut && alvo) barras(alvo, fut, renda);
