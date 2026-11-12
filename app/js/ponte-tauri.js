@@ -22,17 +22,38 @@
   let avisarNova = null;
   // o "ultimo backup" vem do nome do arquivo: syvo-backup-aaaa-mm-dd[-hhmmss].db
   const dataDoBackup = nome => { const m = /syvo-backup-(\d{4}-\d{2}-\d{2})(?:-(\d{2})(\d{2})(\d{2}))?/.exec(nome || ''); return m ? `${m[1]}T${m[2] || '00'}:${m[3] || '00'}:${m[4] || '00'}` : null; };
+  // no android o seletor de arquivo do rust devolve content://, entao a tela le o arquivo e manda os bytes
+  const android = /Android/i.test(navigator.userAgent);
+  const escolherArquivo = aceita => new Promise(res => {
+    const i = document.createElement('input'); i.type = 'file'; if(aceita) i.accept = aceita;
+    i.addEventListener('change', () => res(i.files && i.files[0] || null), { once: true });
+    i.click();
+  });
+  const bytes = async f => Array.from(new Uint8Array(await f.arrayBuffer()));
+  async function restaurarCelular(){
+    const f = await escolherArquivo();
+    if(!f) return { cancelado: true };
+    if(!await window.confirmar('Restaurar este backup?\n\nOs dados atuais serão substituídos pelos do backup. Antes disso, uma cópia dos dados atuais é guardada na pasta de backups.')) return { cancelado: true };
+    const r = await invoke('backup_restaurar_bytes', { conteudo: await bytes(f) });
+    if(r && r.ok) location.reload();
+    return r;
+  }
+  async function anexarCelular(itemId){
+    const f = await escolherArquivo('application/pdf,image/png,image/jpeg');
+    if(!f) return { cancelado: true };
+    return invoke('ir_anexar_bytes', { itemId, nome: f.name, conteudo: await bytes(f) });
+  }
   window.syvoNativo = {
     banco: d => invoke('banco_executar', { d }),
     alerta: msg => alertaNativo(String(msg)),
     confirmar: msg => confirmarNativo(String(msg)),
     backupEstado: () => invoke('backup_estado').then(e => ({ ultimoBackup: dataDoBackup(e.ultimo), erro: null })),
-    backupExportar: () => invoke('backup_exportar'),
+    backupExportar: () => android ? Promise.reject(new Error('No celular o Syvo faz um backup sozinho todo dia. Para levar os dados para outro aparelho, exporte pelo computador.')) : invoke('backup_exportar'),
     backupAgora: () => invoke('backup_agora'),
-    backupRestaurar: () => invoke('backup_restaurar'),
-    mostrarBanco: () => invoke('banco_mostrar'),
-    apagarTudo: () => invoke('apagar_tudo'),
-    irAnexar: itemId => invoke('ir_anexar', { itemId }),
+    backupRestaurar: () => android ? restaurarCelular() : invoke('backup_restaurar'),
+    mostrarBanco: () => invoke('banco_mostrar').catch(e => window.avisar(String(e))),
+    apagarTudo: () => invoke('apagar_tudo').then(() => { if(android) location.reload(); }),
+    irAnexar: itemId => android ? anexarCelular(itemId) : invoke('ir_anexar', { itemId }),
     irAnexos: ano => invoke('ir_anexos', { ano: Number(ano) }),
     irAbrirAnexo: id => invoke('ir_abrir_anexo', { id }),
     irRemoverAnexo: id => invoke('ir_remover_anexo', { id }),

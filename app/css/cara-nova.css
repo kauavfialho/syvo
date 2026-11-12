@@ -370,3 +370,8 @@ kbd.atalho{ margin-left:8px; font-family:'Space Mono',monospace; font-size:0.7re
 .tl-link:hover{ transform:translateY(-3px); box-shadow:0 16px 40px rgba(60,70,40,0.14); }
 .tl-ver{ font-weight:600; color:var(--ink) !important; }
 .tl-link:hover .tl-ver{ text-decoration:underline; }
+
+/* todas as janelas com canto arredondado, e sempre por cima da doca */
+.modal-overlay{ z-index:120 !important; }
+.modal-overlay > .modal{ border-radius:24px !important; }
+@media (max-width:700px){ .modal-overlay > .modal{ max-height:calc(100dvh - 32px); overflow:auto; } }

@@ -165,16 +165,55 @@ async fn backup_restaurar(app: tauri::AppHandle, estado: tauri::State<'_, Estado
 
 #[tauri::command]
 fn banco_mostrar(app: tauri::AppHandle, estado: tauri::State<Estado>) -> Result<(), String> {
-    use tauri_plugin_opener::OpenerExt;
-    app.opener().reveal_item_in_dir(estado.pasta.join("syvo.db")).map_err(|e| e.to_string())
+    mostrar_arquivo(&app, &estado.pasta.join("syvo.db"))
+}
+#[cfg(desktop)]
+fn mostrar_arquivo(app: &tauri::AppHandle, p: &Path) -> Result<(), String> { use tauri_plugin_opener::OpenerExt; app.opener().reveal_item_in_dir(p).map_err(|e| e.to_string()) }
+#[cfg(mobile)]
+fn mostrar_arquivo(_app: &tauri::AppHandle, _p: &Path) -> Result<(), String> { Err("No celular o arquivo fica guardado dentro do app.".into()) }
+
+// no celular o seletor de arquivo devolve um endereco do android (content://), que o rust nao le direto.
+// entao a tela le o arquivo e manda os bytes pra ca. troca o banco sem reiniciar o app: a tela recarrega sozinha
+#[tauri::command]
+fn backup_restaurar_bytes(estado: tauri::State<Estado>, conteudo: Vec<u8>) -> Result<Value, String> {
+    let temp = std::env::temp_dir().join(format!("syvo-restaura-{}.db", uuid::Uuid::new_v4()));
+    fs::write(&temp, &conteudo).map_err(|e| e.to_string())?;
+    if !banco_valido(&temp) { let _ = fs::remove_file(&temp); return Ok(json!({ "erro": "Esse arquivo não é um backup válido do Syvo." })); }
+    let r = trocar_arquivo(&estado, Some(&temp));
+    let _ = fs::remove_file(&temp);
+    r?;
+    reabrir(&estado)?;
+    Ok(json!({ "ok": true }))
+}
+
+// abre de novo o syvo.db (depois de trocar o arquivo), passando pelas migracoes
+fn reabrir(estado: &Estado) -> Result<(), String> {
+    let novo = banco::abrir(&estado.pasta.join("syvo.db").to_string_lossy()).map_err(|e| e.mensagem)?;
+    *estado.db.lock().unwrap() = novo;
+    Ok(())
+}
+
+// no celular o backup vai pra tela como bytes, e ela oferece pra salvar ou compartilhar
+#[tauri::command]
+fn backup_bytes(estado: tauri::State<Estado>) -> Result<Vec<u8>, String> {
+    let temp = std::env::temp_dir().join(format!("syvo-exporta-{}.db", uuid::Uuid::new_v4()));
+    { let _g = estado.db.lock().unwrap(); copiar_banco(&estado.pasta.join("syvo.db"), &temp)?; }
+    let b = fs::read(&temp).map_err(|e| e.to_string());
+    let _ = fs::remove_file(&temp);
+    b
 }
 
 #[tauri::command]
 fn apagar_tudo(app: tauri::AppHandle, estado: tauri::State<Estado>) -> Result<(), String> {
     // a copia de seguranca fica na pasta de backups, entao da pra voltar atras
     trocar_arquivo(&estado, None)?;
-    app.restart();
+    recomecar(&app, &estado)
 }
+// no computador reinicia o app; no celular so reabre o banco e a tela recarrega
+#[cfg(desktop)]
+fn recomecar(app: &tauri::AppHandle, _estado: &Estado) -> Result<(), String> { app.restart() }
+#[cfg(mobile)]
+fn recomecar(_app: &tauri::AppHandle, estado: &Estado) -> Result<(), String> { reabrir(estado) }
 
 #[tauri::command]
 async fn ir_anexar(app: tauri::AppHandle, estado: tauri::State<'_, Estado>, item_id: String) -> Result<Value, String> {
@@ -189,6 +228,19 @@ async fn ir_anexar(app: tauri::AppHandle, estado: tauri::State<'_, Estado>, item
     let conteudo = fs::read(&origem).map_err(|e| e.to_string())?;
     let nome = origem.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default();
     let db = estado.db.lock().unwrap();
+    db.execute("insert into ir_anexos (id, criado_em, item_id, nome, conteudo) values (?1, ?2, ?3, ?4, ?5)", rusqlite::params![uuid::Uuid::new_v4().to_string(), banco::agora(), item_id, nome, conteudo]).map_err(|e| e.to_string())?;
+    Ok(json!({}))
+}
+
+// mesma coisa do ir_anexar, mas com o arquivo ja lido pela tela (celular)
+#[tauri::command]
+fn ir_anexar_bytes(estado: tauri::State<Estado>, item_id: String, nome: String, conteudo: Vec<u8>) -> Result<Value, String> {
+    let ext = Path::new(&nome).extension().map(|e| e.to_string_lossy().to_lowercase()).unwrap_or_default();
+    if !ANEXO_EXT.contains(&ext.as_str()) { return Ok(json!({ "erro": "Use um arquivo PDF, PNG ou JPG." })); }
+    if conteudo.len() as u64 > ANEXO_MAX { return Ok(json!({ "erro": "O arquivo passa de 15 MB. Use um arquivo menor." })); }
+    let db = estado.db.lock().unwrap();
+    if db.query_row("select 1 from ir_itens where id = ?1", [&item_id], |_| Ok(())).is_err() { return Ok(json!({ "erro": "Item não encontrado." })); }
+    let nome: String = Path::new(&nome).file_name().map(|n| n.to_string_lossy().chars().take(200).collect()).unwrap_or_default();
     db.execute("insert into ir_anexos (id, criado_em, item_id, nome, conteudo) values (?1, ?2, ?3, ?4, ?5)", rusqlite::params![uuid::Uuid::new_v4().to_string(), banco::agora(), item_id, nome, conteudo]).map_err(|e| e.to_string())?;
     Ok(json!({}))
 }
@@ -240,6 +292,7 @@ fn abrir_releases(app: tauri::AppHandle) -> Result<(), String> {
     app.opener().open_url("https://github.com/kauavfialho/syvo/releases/latest", None::<&str>).map_err(|e| e.to_string())
 }
 
+#[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
@@ -252,7 +305,7 @@ pub fn run() {
             app.manage(Estado { db: Mutex::new(db), pasta, aviso: Mutex::new(aviso), idioma: Mutex::new("pt".into()) });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![banco_executar, app_versao, app_aviso, app_idioma, backup_agora, backup_estado, ainda_nao, backup_exportar, backup_restaurar, banco_mostrar, apagar_tudo, ir_anexar, ir_anexos, ir_abrir_anexo, ir_remover_anexo, abrir_releases, log_js])
+        .invoke_handler(tauri::generate_handler![banco_executar, app_versao, app_aviso, app_idioma, backup_agora, backup_estado, ainda_nao, backup_exportar, backup_restaurar, banco_mostrar, apagar_tudo, ir_anexar, ir_anexos, ir_abrir_anexo, ir_remover_anexo, abrir_releases, log_js, backup_restaurar_bytes, backup_bytes, ir_anexar_bytes])
         .run(tauri::generate_context!())
         .expect("erro ao abrir o syvo");
 }

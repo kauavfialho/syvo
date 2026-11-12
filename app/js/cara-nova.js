@@ -134,7 +134,7 @@
 
   // ---- guia passo a passo ----
   const PASSOS = [
-    { alvo: '.topbar-logo', tit: 'Este é o Syvo', txt: 'Tudo fica só no seu computador. Nada vai para a internet, a não ser a cotação de moedas.', acao: 'No ☰ Menu, em Meu perfil, coloque seu nome e sua foto.' },
+    { alvo: '.topbar-logo', tit: 'Este é o Syvo', txt: 'Tudo fica só neste aparelho. Nada vai para a internet, a não ser a cotação de moedas.', acao: 'No ☰ Menu, em Meu perfil, coloque seu nome e sua foto.' },
     { alvo: '#btnWaffle', tit: 'Cadastre seus cartões', txt: 'No Menu ficam Meus cartões, o perfil e o backup. Cadastre cada cartão com a cor e o dia do vencimento.', acao: '👉 Menu → Meus cartões → + Novo cartão.' },
     { alvo: '.novo-wrap', tit: 'Lance o que entra e o que sai', txt: 'No + Novo você escolhe o que lançar: Gasto para uma compra, Conta mensal para o que se repete, Renda para o salário e A receber quando alguém te deve.', acao: '👉 Depois do guia, comece pela sua Renda do mês.', menu: true },
     { alvo: '#btnImportarExtrato', tit: 'Ou importe a fatura inteira', txt: 'Baixe a fatura ou o extrato no app do banco (CSV ou OFX) e mande aqui. O Syvo lê linha por linha e você só confere.', acao: '👉 Clique em Importar extrato.', tela: 'mensal' },
@@ -219,5 +219,8 @@
   addEventListener('resize', () => { if($('#tourBolha').classList.contains('on')) posicionar(); });
   // primeira vez que a pessoa abre esta versao: o guia aparece sozinho
   let visto = null; try { visto = localStorage.getItem('syvo-tour-visto'); } catch(e){}
-  if(!visto) setTimeout(() => { if(document.body.classList.contains('logged-in') || $('.topbar-logo')) iniciarTour(); }, 2500);
+  // se a tela de boas-vindas ("como voce vai usar o syvo?") estiver aberta, espera ela fechar
+  const boasVindasAberta = () => { const m = document.getElementById('modalTipoUso'); return m && !m.classList.contains('hidden'); };
+  const tentarTour = () => { if(boasVindasAberta()){ setTimeout(tentarTour, 800); return; } iniciarTour(); };
+  if(!visto) setTimeout(() => { if(document.body.classList.contains('logged-in') || $('.topbar-logo')) tentarTour(); }, 2500);
 })();
